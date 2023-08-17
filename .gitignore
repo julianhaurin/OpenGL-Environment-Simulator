@@ -1,0 +1,18 @@
+# OpenGL Environment Simulator .gitignore - 8/17/2023
+
+.vs/
+bin/
+dependencies/
+
+*.sln
+*.vcxproj
+*.filters
+*.user
+
+*.obj
+*.exe
+
+*.dll
+*.lib
+
+*.log
