@@ -3,18 +3,11 @@
 #include "utility.h"
 
 
-// Initiliazes GLFW and GLEW and returns a pointer to the current GLFW window
-GLFWwindow* setupOpenGLContext(const uint32_t screenWidth, const uint32_t screenHeight) {
+// Initiliazes GLFW and returns a pointer to the current GLFW window
+GLFWwindow* setupGLFWWindow(const uint32_t screenWidth, const uint32_t screenHeight) {
 
     if (glfwInit() == GLFW_FALSE) {
         std::cout << "[J] - ERROR: GLFW failed to initialize\n";
-        return nullptr;
-    }
-
-    // glewInit() != GLEW_OK
-    if (!glewInit()) {
-        std::cout << "[J] - ERROR: GLEW failed to initialize\n";
-        glfwTerminate();
         return nullptr;
     }
 
@@ -36,6 +29,18 @@ GLFWwindow* setupOpenGLContext(const uint32_t screenWidth, const uint32_t screen
 
     return window;
 
+}
+
+void processInputs(GLFWwindow* window) {
+
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+        glfwSetWindowShouldClose(window, true);
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }
 
 void glfwErrorCallback(int code, const char* description) {

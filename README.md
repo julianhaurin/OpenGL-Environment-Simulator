@@ -6,8 +6,9 @@ WATER SIMULATION RESOURCES:
 Reducible, FFT, 2021: https://www.youtube.com/watch?v=h7apO7q16V0&ab_channel=Reducible
 
 Jerry Tessendorf, Simulating Ocean Water, 2004: https://people.computing.clemson.edu/~jtessen/reports/papers_files/coursenotes2004.pdf
+Jerry Tessdendorf, Interavtive Water Surfaces, 2004: https://people.computing.clemson.edu/~jtessen/reports/papers_files/Interactive_Water_Surfaces.pdf
 
-Matthias Muller, Resources: https://matthias-research.github.io/pages/publications/publications.html, https://ubm-twvideo01.s3.amazonaws.com/o1/vault/gdc08/slides/S6509i1.pdf
+Matthias Muller, Resources: https://matthias-research.github.io/pages/publications/publications.html, https://ubm-twvideo01.s3.amazonaws.com/o1/vault/gdc08/slides/S6509i1.pdf 
 Bernhard Fleck, Real-Time Rendering of Water in CG: https://scholarworks.calstate.edu/downloads/m900nt80d
 
 Keith Lantz, Ocean Simulation, 2011: https://www.keithlantz.net/2011/10/ocean-simulation-part-one-using-the-discrete-fourier-transform/

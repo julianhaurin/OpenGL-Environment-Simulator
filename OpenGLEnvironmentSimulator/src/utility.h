@@ -7,8 +7,11 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-// Initiliazes GLFW and GLEW and returns a pointer to the current GLFW window
-GLFWwindow* setupOpenGLContext(const uint32_t screenHeight, const uint32_t screenWidth);
+// Initiliazes GLFW and returns a pointer to the current GLFW window
+GLFWwindow* setupGLFWWindow(const uint32_t screenHeight, const uint32_t screenWidth);
+
+// processes key inputs from user
+void processInputs(GLFWwindow* window);
 
 // GLFW callback functions
 void glfwErrorCallback(int code, const char* description);
