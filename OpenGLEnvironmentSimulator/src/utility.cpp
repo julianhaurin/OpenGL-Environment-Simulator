@@ -4,7 +4,7 @@
 
 
 // Initiliazes GLFW and GLEW and returns a pointer to the current GLFW window
-GLFWwindow* setupOpenGLContext(const uint32_t screenHeight, const uint32_t screenWidth) {
+GLFWwindow* setupOpenGLContext(const uint32_t screenWidth, const uint32_t screenHeight) {
 
     if (glfwInit() == GLFW_FALSE) {
         std::cout << "[J] - ERROR: GLFW failed to initialize\n";
@@ -30,8 +30,20 @@ GLFWwindow* setupOpenGLContext(const uint32_t screenHeight, const uint32_t scree
         return nullptr;
     }
 
-    glfwMakeContextCurrent(window);
+    // glfw callback functions
+    glfwSetErrorCallback(glfwErrorCallback);
+    glfwSetFramebufferSizeCallback(window, glfwFramebufferSizeCallback);
 
     return window;
+
+}
+
+void glfwErrorCallback(int code, const char* description) {
+    std::cout << "[J] - ERROR: GLFW error reported: " << description << std::endl;
+
+}
+
+void glfwFramebufferSizeCallback(GLFWwindow* window, int width, int height) {
+    glViewport(0, 0, width, height);
 
 }

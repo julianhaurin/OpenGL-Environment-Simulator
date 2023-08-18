@@ -1,27 +1,18 @@
 // OpenGL Environment Simulator - Julian + Alex Haurin - 8/17/23
 
+#define GLEW_STATIC
+
 #include <iostream>
 #include <cstdint>
 
-#define GLEW_STATIC
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
 #include "utility.h"
 
-
 static const uint32_t SCREEN_HEIGHT = 600;
 static const uint32_t SCREEN_WIDTH = 800;
 
-void glfwErrorCallback(int code, const char* description) {
-    std::cout << "[J] - ERROR: GLFW error reported: " << description << std::endl;
-
-}
-
-void glfwFramebufferSizeCallback(GLFWwindow* window, int width, int height) {
-    glViewport(0, 0, width, height);
-
-}
 
 int main() 
 {
@@ -31,15 +22,22 @@ int main()
         std::cout << "[J] - ERROR: Failed to initialize OpenGL with setupOpenGLContext()\n";
     }
 
-    // glfw callback functions
-    glfwSetErrorCallback(glfwErrorCallback);
-    glfwSetFramebufferSizeCallback(window, glfwFramebufferSizeCallback);
-
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // hides and captures cursor
+    glEnable(GL_DEPTH_TEST);
+    glfwMakeContextCurrent(window);
 
     // render loop
+    while (glfwWindowShouldClose(window) == false) {
+
+        // Render
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClearColor(0.05f, 0.2f, 0.3f, 1.0f); // background color
 
 
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+
+    }
 
     glfwDestroyWindow(window);
     glfwTerminate();
