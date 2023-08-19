@@ -1,7 +1,10 @@
 
 #pragma once
 
+#include <iostream>
+
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 enum CameraMovement {
 	Forwards,
@@ -18,11 +21,15 @@ public:
 	const static float initMouseSensitivity;
 	const static float initZoom;
 
-	Camera(glm::vec3 position, glm::vec3 worldUp, float yaw, float pitch);
+	Camera(glm::vec3 position, glm::vec3 worldUp = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = -90.0f, float pitch = 0.0f);
 
 	void ProcessKeyboardInput(CameraMovement in_Direction, float deltaTime);
-	void ProcessMouseInput(float in_xOffset, float in_yOffset, bool in_ConstrainPitch);
+	void ProcessMouseInput(float in_xOffset, float in_yOffset, bool in_ConstrainPitch = true);
 	void ProcessMouseScroll(float in_yOffset);
+
+	glm::mat4 CalculateViewMatrix() const;
+	float getZoom() const;
+
 
 private:
 

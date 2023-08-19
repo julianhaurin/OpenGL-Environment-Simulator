@@ -5,7 +5,7 @@ const float Camera::initSpeed = 2.5f;
 const float Camera::initMouseSensitivity = 0.1f;
 const float Camera::initZoom = 45.0f;
 
-Camera::Camera(glm::vec3 position, glm::vec3 worldUp, float yaw = -90.0f, float pitch = 0.0f)
+Camera::Camera(glm::vec3 position, glm::vec3 worldUp, float yaw, float pitch)
 	: m_Position(position), m_WorldUp(worldUp),
 	m_Right(glm::vec3(1.0f, 0.0f, 0.0f)),
 	m_Up(glm::vec3(0.0f, 1.0f, 0.0f)),
@@ -53,6 +53,15 @@ void Camera::ProcessMouseScroll(float in_yOffset) {
 		m_Zoom = 1.0f;
 	if (m_Zoom > 45.0f)
 		m_Zoom = 45.0f;
+}
+
+glm::mat4 Camera::CalculateViewMatrix() const {
+	return glm::lookAt(m_Position, m_Position + m_Front, m_Up);
+}
+
+float Camera::getZoom() const { 
+	return m_Zoom;
+
 }
 
 void Camera::updateCameraVectors() {
