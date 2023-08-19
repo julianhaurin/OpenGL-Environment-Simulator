@@ -27,20 +27,11 @@ GLFWwindow* setupGLFWWindow(const uint32_t screenWidth, const uint32_t screenHei
     glfwSetErrorCallback(glfwErrorCallback);
     glfwSetFramebufferSizeCallback(window, glfwFramebufferSizeCallback);
 
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // hides and captures cursor
+    glEnable(GL_DEPTH_TEST);
+
     return window;
 
-}
-
-void processInputs(GLFWwindow* window) {
-
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-        glfwSetWindowShouldClose(window, true);
-    }
-
-    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }
 
 void glfwErrorCallback(int code, const char* description) {
@@ -52,3 +43,29 @@ void glfwFramebufferSizeCallback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 
 }
+
+void glfwCleanUp(GLFWwindow* window) {
+    glfwDestroyWindow(window);
+    glfwTerminate();
+
+}
+
+
+
+
+
+
+//void glfwMouseCallback(GLFWwindow* in_Window, double in_xPos, double in_yPos) {
+//    const float pPos = static_cast<float>(in_xPos);
+//    const float yPos = static_cast<float>(in_yPos);
+//
+//    float xOffset = xPos - lastX;
+//    float yOffset = lastY - yPos;
+//
+//}
+//
+//void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+//{
+//    camera.ProcessMouseScroll(static_cast<float>(yoffset));
+//}
+
