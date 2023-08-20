@@ -3,6 +3,7 @@
 // Notes:
 // version might not be right in shaders
 // glfw callback function require global camera class - fix
+// add up and down movements to camera class
 
 #define GLEW_STATIC
 
@@ -16,7 +17,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Shader.h"
+#include "shader/ShaderProgram.h"
 #include "Camera.h"
 #include "utility.h"
 
@@ -68,7 +69,7 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    Shader shaderProgram("./shaders/vertexShader.vs", "./shaders/fragmentShader.fs");
+    ShaderProgram shaderProgram("./shaders/vertexShader.vs", "./shaders/fragmentShader.fs");
     shaderProgram.CompileShaders();
     shaderProgram.UseProgram();
 
@@ -84,12 +85,6 @@ int main()
         glm::mat4 model = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
         glm::mat4 view = camera.CalculateViewMatrix();
         glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
-
-        std::cout << view[0].x << view[0].y << view[0].z << view[0].w << " ";
-        std::cout << view[1].x << view[1].y << view[1].z << view[1].w << " ";
-        std::cout << view[2].x << view[2].y << view[2].z << view[2].w << " ";
-        std::cout << view[3].x << view[3].y << view[3].z << view[3].w << " ";
-        std::cout << std::endl;
 
         shaderProgram.SetMat4("model", model);
         shaderProgram.SetMat4("view", view);

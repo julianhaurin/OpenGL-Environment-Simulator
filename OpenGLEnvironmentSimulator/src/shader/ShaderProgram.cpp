@@ -1,7 +1,7 @@
 
-#include "Shader.h"
+#include "ShaderProgram.h"
 
-Shader::Shader(const char* in_vertexShaderPath, const char* in_fragmentShaderPath) {
+ShaderProgram::ShaderProgram(const char* in_vertexShaderPath, const char* in_fragmentShaderPath) {
 
 	// creates file streams and reads shader source code into strings
 	std::ifstream vertFileStream;
@@ -11,11 +11,11 @@ Shader::Shader(const char* in_vertexShaderPath, const char* in_fragmentShaderPat
 	fragFileStream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 
 	try {
-		vertFileStream.open(in_vertexShaderPath);
-		fragFileStream.open(in_fragmentShaderPath);
-
 		std::stringstream vertStrStream;
 		std::stringstream fragStrStream;
+
+		vertFileStream.open(in_vertexShaderPath);
+		fragFileStream.open(in_fragmentShaderPath);
 
 		vertStrStream << vertFileStream.rdbuf();
 		fragStrStream << fragFileStream.rdbuf();
@@ -35,7 +35,7 @@ Shader::Shader(const char* in_vertexShaderPath, const char* in_fragmentShaderPat
 
 }
 
-void Shader::CompileShaders() {
+void ShaderProgram::CompileShaders() {
 
 	const char* vertShaderCode = m_vertShaderCode.c_str();
 	const char* fragShaderCode = m_fragShaderCode.c_str();
@@ -64,40 +64,7 @@ void Shader::CompileShaders() {
 
 }
 
-void Shader::UseProgram() {
-	glUseProgram(m_ID);
-}
-
-void Shader::SetBool(const std::string& name, bool value) const {
-	glUniform1i(glGetUniformLocation(m_ID, name.c_str()), (int)value);
-}
-
-void Shader::SetInt(const std::string& name, int value) const {
-	glUniform1i(glGetUniformLocation(m_ID, name.c_str()), value);
-}
-
-void Shader::SetFloat(const std::string& name, float value) const {
-	glUniform1f(glGetUniformLocation(m_ID, name.c_str()), value);
-}
-
-void Shader::SetMat4(const std::string& name, const glm::mat4& mat) const {
-	glUniformMatrix4fv(glGetUniformLocation(m_ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
-}
-
-void Shader::checkCompilationErrors(uint32_t in_shaderID, std::string in_type) const {
-
-	GLint success;
-	char infoLog[1024];
-
-	glGetShaderiv(in_shaderID, GL_COMPILE_STATUS, &success);
-	if (!success) {
-		glGetShaderInfoLog(in_shaderID, 1024, NULL, infoLog);
-		std::cout << "[J] - ERROR: Failed to compile " << in_type << " shader successfully: " << infoLog << std::endl;
-	}
-
-}
-
-void Shader::checkLinkingErrors(uint32_t in_programID) const {
+void ShaderProgram::checkLinkingErrors(uint32_t in_programID) const {
 
 	GLint success;
 	char infoLog[1024];

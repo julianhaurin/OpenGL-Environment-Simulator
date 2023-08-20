@@ -27,3 +27,7 @@ https://github.com/raaavioli/WaterRendering
 Great Water: 
 https://www.jpgrenier.org/ocean.html
 
+Other:
+fft water lecture: https://www.youtube.com/watch?v=ClW3fo94KR4&ab_channel=Codemotion
+https://arm-software.github.io/opengl-es-sdk-for-android/ocean_f_f_t.html
+
