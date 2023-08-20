@@ -20,6 +20,7 @@
 #include "shader/ShaderProgram.h"
 #include "Camera.h"
 #include "utility.h"
+#include "Ocean.h"
 
 static const uint32_t SCREEN_HEIGHT = 600;
 static const uint32_t SCREEN_WIDTH = 800;
@@ -57,21 +58,15 @@ int main()
         return EXIT_FAILURE;
     }
 
-    uint32_t VBO;
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(util_CubeVertices), util_CubeVertices, GL_STATIC_DRAW);
 
-    uint32_t VAO;
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
     ShaderProgram shaderProgram("./shaders/vertexShader.vs", "./shaders/fragmentShader.fs");
     shaderProgram.CompileShaders();
     shaderProgram.UseProgram();
+
+    Ocean ocean(16);
+    ocean.Initialize();
 
     // render loop
     while (glfwWindowShouldClose(window) == false) 
@@ -82,34 +77,25 @@ int main()
 
         processInputs(window);
 
-        glm::mat4 model = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
+        glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 view = camera.CalculateViewMatrix();
         glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
 
         shaderProgram.SetMat4("model", model);
         shaderProgram.SetMat4("view", view);
         shaderProgram.SetMat4("projection", projection);
-
-        float timeValue = glfwGetTime();
-        float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
-        shaderProgram.SetFloat("u_Color", greenValue);
-
         shaderProgram.UseProgram();
 
         // render
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glClearColor(0.05f, 0.2f, 0.3f, 1.0f); // background color
+        glClearColor(0.05f, 0.05f, 0.05f, 1.0f); // background color
         
-        glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        ocean.Update();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
 
     }
-
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
 
     glfwCleanUp(window);
 
@@ -131,6 +117,11 @@ void processInputs(GLFWwindow* window) {
         camera.ProcessKeyboardInput(Left, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.ProcessKeyboardInput(Right, deltaTime);
+
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        camera.ProcessKeyboardInput(Up, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+        camera.ProcessKeyboardInput(Down, deltaTime);
 
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -162,6 +153,17 @@ void glfwScrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
     camera.ProcessMouseScroll(static_cast<float>(yoffset));
 
 }
+
+//uint32_t VBO;
+//glGenBuffers(1, &VBO);
+//glBindBuffer(GL_ARRAY_BUFFER, VBO);
+//glBufferData(GL_ARRAY_BUFFER, sizeof(util_CubeVertices), util_CubeVertices, GL_STATIC_DRAW);
+//
+//uint32_t VAO;
+//glGenVertexArrays(1, &VAO);
+//glBindVertexArray(VAO);
+//
+//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 
 
 

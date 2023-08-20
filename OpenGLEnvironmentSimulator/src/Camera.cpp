@@ -28,6 +28,11 @@ void Camera::ProcessKeyboardInput(CameraMovement in_Direction, float deltaTime) 
 	else if (in_Direction == Right)
 		m_Position += m_Right * velocity;
 
+	if (in_Direction == Up)
+		m_Position += m_Up * velocity;
+	if (in_Direction == Down)
+		m_Position -= m_Up * velocity;
+
 }
 
 void Camera::ProcessMouseInput(float in_xOffset, float in_yOffset, bool in_ConstrainPitch) {
