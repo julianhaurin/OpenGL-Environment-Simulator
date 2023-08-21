@@ -1,9 +1,14 @@
 
 #include "Ocean.h"
 
-Ocean::Ocean(const uint32_t gridLength)
-	: m_GridSideLength(gridLength)
-{}
+const float Ocean::gravityConst = 9.81f;
+
+Ocean::Ocean(const uint32_t gridLength, const float waveHeight_A, glm::vec2 windDir_w)
+	: m_GridSideLength(gridLength), m_phillipsConstant_A(waveHeight_A), m_windDir_w(windDir_w)
+{
+	assert(m_GridSideLength && !(m_GridSideLength & (m_GridSideLength - 1))); // grid length == power of 2
+
+}
 
 Ocean::~Ocean() 
 {
@@ -75,6 +80,15 @@ void Ocean::DeallocateResources() {
 	glDeleteVertexArrays(1, &m_GridVBO);
 	glDeleteBuffers(1, &m_GridVAO);
 	glDeleteBuffers(1, &m_GridEBO);
+
+}
+
+float Ocean::dispersionRelation(int gridLenRange) const {
+
+	float w_0 = 2.0f * M_PI / 50.0f;
+	float kx = M_PI * (2 * gridLenRange) / gridLenRange;
+	float kz = M_PI * (2 * gridLenRange) / gridLenRange;
+	return floor(sqrt(m_gravitationalConstant * sqrt(kx * kx + kz * kz)) / w_0) * w_0;
 
 }
 

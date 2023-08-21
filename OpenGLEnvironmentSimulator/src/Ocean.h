@@ -11,6 +11,7 @@
 #include <iostream>
 #include <vector>
 #include <cstdint>
+#include <cassert>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -30,7 +31,10 @@
 class Ocean
 {
 public:
-	Ocean(const uint32_t gridLength = 256);
+
+	const static float gravityConst;
+
+	Ocean(const uint32_t gridLength = 256, const float waveHeight_A = 1.0f, glm::vec2 windDir_w = glm::vec2(1.0f, 1.0f));
 	~Ocean();
 
 	void Initialize();
@@ -38,6 +42,8 @@ public:
 
 private:
 	const int m_GridSideLength;
+	const float m_phillipsConstant_A;
+	const glm::vec2 m_windDir_w;
 
 	uint32_t m_GridVBO;
 	uint32_t m_GridVAO;
@@ -46,5 +52,6 @@ private:
 	void DeallocateResources();
 
 	float phillipsSpectrum(int gridLenRange) const;
+	float dispersionRelation(int gridLenRange) const;
 
 };
