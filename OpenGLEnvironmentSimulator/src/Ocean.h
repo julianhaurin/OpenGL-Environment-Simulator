@@ -41,6 +41,7 @@ public:
 	void Update();
 
 private:
+	// wave parameters
 	const int m_GridSideLength;
 	const float m_phillipsConstant_A;
 	const glm::vec2 m_windDir_w;

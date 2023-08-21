@@ -1,4 +1,11 @@
 
+// Notes:
+// phillips spectrum and dispersion functions both might not be accurate,
+// other implementations have a 'length' parameter and use
+// m - N / length for k vector
+//
+// wind speed is controlled by w vector (wind direction vector) 
+
 #include "Ocean.h"
 
 const float Ocean::gravityConst = 9.81f;
@@ -86,38 +93,34 @@ void Ocean::DeallocateResources() {
 float Ocean::dispersionRelation(int gridLenRange) const {
 
 	float w_0 = 2.0f * M_PI / 50.0f;
-	float kx = M_PI * (2 * gridLenRange) / gridLenRange;
-	float kz = M_PI * (2 * gridLenRange) / gridLenRange;
-	return floor(sqrt(m_gravitationalConstant * sqrt(kx * kx + kz * kz)) / w_0) * w_0;
+	float kx = M_PI * (2 * gridLenRange - m_GridSideLength);
+	float kz = M_PI * (2 * gridLenRange - m_GridSideLength);
+	return floor(sqrt(gravityConst * sqrt(kx * kx + kz * kz)) / w_0) * w_0;
 
 }
 
 float Ocean::phillipsSpectrum(int gridLenRange) const {
 
-	const float kx = (2 * M_PI * gridLenRange) / (m_GridSideLength);
-	const float ky = (2 * M_PI * gridLenRange) / (m_GridSideLength);
+	const float kx = (2 * M_PI * gridLenRange - m_GridSideLength);
+	const float ky = (2 * M_PI * gridLenRange - m_GridSideLength);
 
 	glm::vec2 k(kx, ky);
-	glm::vec2 windDirection_w(1.0f, 1.0f);
 
 	const float kLen2 = glm::length(k) * glm::length(k);
 	const float kLen4 = kLen2 * kLen2;
 
-	const float kDotw = glm::dot(glm::normalize(k), glm::normalize(windDirection_w));
+	const float kDotw = glm::dot(glm::normalize(k), glm::normalize(m_windDir_w));
 	const float magnitudeKW = glm::length(kDotw);
 
-	const float windSpeed_V = 32.0f;
-	const float gravitationalConstant_g = 9.81f;
+	const float windSpeed_V = glm::length(m_windDir_w);
 
-	const float L = (windSpeed_V * windSpeed_V) / gravitationalConstant_g;
+	const float L = (windSpeed_V * windSpeed_V) / gravityConst;
 	const float kL2 = (L * L) * kLen2;
-	
-	const float numericalConstant_A = 1.0f;
 
 	float damping = 0.001;
 	float l2 = L * L * damping * damping;
 
-	return numericalConstant_A * (std::exp(-1.0f / (kL2)) / kLen4) 
+	return m_phillipsConstant_A * (std::exp(-1.0f / (kL2)) / kLen4) 
 		 * magnitudeKW * magnitudeKW * std::exp(-kLen2 * l2);
 
 }
