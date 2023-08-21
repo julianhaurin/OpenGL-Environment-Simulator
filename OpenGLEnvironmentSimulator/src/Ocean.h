@@ -12,6 +12,10 @@
 #include <vector>
 #include <cstdint>
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+#include <complex>
+
 #define GLEW_STATIC
 #include <GL/glew.h>
 
@@ -40,5 +44,7 @@ private:
 	uint32_t m_GridEBO;
 
 	void DeallocateResources();
+
+	float phillipsSpectrum(int gridLenRange) const;
 
 };

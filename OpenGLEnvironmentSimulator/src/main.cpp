@@ -72,7 +72,7 @@ int main()
     shaderProgram.CompileShaders();
     shaderProgram.UseProgram();
 
-    Ocean ocean(16);
+    Ocean ocean(64);
     ocean.Initialize();
 
     // render loop
