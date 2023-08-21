@@ -8,6 +8,7 @@
 // to the Update() function?
 //
 
+#include <iostream>
 #include <vector>
 #include <cstdint>
 
@@ -16,11 +17,11 @@
 
 #include <glm/glm.hpp>
 
-struct OceanVertex {
-	glm::vec3 position;
-	OceanVertex() : position(glm::vec3(0.0f, 0.0f, 0.0f)) {};
-	OceanVertex(glm::vec3 in_pos) : position(in_pos) {};
-};
+//struct OceanVertex {
+//	glm::vec3 position;
+//	OceanVertex() : position(glm::vec3(0.0f, 0.0f, 0.0f)) {};
+//	OceanVertex(glm::vec3 in_pos) : position(in_pos) {};
+//};
 
 class Ocean
 {

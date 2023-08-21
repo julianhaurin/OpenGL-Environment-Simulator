@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <cstdint>
+#include <cassert>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -36,6 +37,12 @@ void glfwScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f);
 float lastY = SCREEN_HEIGHT / 2.0f;
 float lastX = SCREEN_WIDTH / 2.0f;
+
+void printVector(std::vector<glm::vec3> vec) {
+    for (int i = 0; i < vec.size(); i++) {
+        std::cout << vec[i].x << ", " << vec[i].y << ", " << vec[i].z << ",\n";
+    }
+}
 
 int main() 
 {
@@ -79,7 +86,7 @@ int main()
 
         glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 view = camera.CalculateViewMatrix();
-        glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
+        glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 255.0f);
 
         shaderProgram.SetMat4("model", model);
         shaderProgram.SetMat4("view", view);
@@ -153,17 +160,5 @@ void glfwScrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
     camera.ProcessMouseScroll(static_cast<float>(yoffset));
 
 }
-
-//uint32_t VBO;
-//glGenBuffers(1, &VBO);
-//glBindBuffer(GL_ARRAY_BUFFER, VBO);
-//glBufferData(GL_ARRAY_BUFFER, sizeof(util_CubeVertices), util_CubeVertices, GL_STATIC_DRAW);
-//
-//uint32_t VAO;
-//glGenVertexArrays(1, &VAO);
-//glBindVertexArray(VAO);
-//
-//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-
 
 

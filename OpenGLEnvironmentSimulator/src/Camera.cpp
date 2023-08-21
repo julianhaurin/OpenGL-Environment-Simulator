@@ -1,7 +1,7 @@
 
 #include "Camera.h"
 
-const float Camera::initSpeed = 2.5f;
+const float Camera::initSpeed = 5.0f;
 const float Camera::initMouseSensitivity = 0.1f;
 const float Camera::initZoom = 45.0f;
 
