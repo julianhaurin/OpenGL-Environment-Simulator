@@ -185,10 +185,6 @@ void Ocean::Render(const float time, glm::mat4 in_ModelMat, glm::mat4 in_ViewMat
 	m_OceanShaderProgram.SetMat4("u_View", in_ViewMat);
 	m_OceanShaderProgram.SetMat4("u_Projection", in_ProjeMat);
 
-	//glBindVertexArray(VAO);
-	//glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-
 	glBindVertexArray(m_GridVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_GridVBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_GridEBO);
