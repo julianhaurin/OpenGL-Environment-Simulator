@@ -60,9 +60,9 @@ void Ocean::Initialize() {
 			hTilde0 = hTilde_0(n, m);
 			hTilde0mkConj = conj(hTilde_0(-n, -m));
 
-			m_Vertices[idx].ox = static_cast<float>(n - m_GridSideDimension / 2.0f); // *m_Length / m_GridSideDimension;
+			m_Vertices[idx].ox = static_cast<float>(n - m_GridSideDimension / 2.0f) * m_Length / m_GridSideDimension;
 			m_Vertices[idx].oy = 0.0f;
-			m_Vertices[idx].oz = static_cast<float>(m - m_GridSideDimension / 2.0f); // *m_Length / m_GridSideDimension;
+			m_Vertices[idx].oz = static_cast<float>(m - m_GridSideDimension / 2.0f) * m_Length / m_GridSideDimension;
 
 			m_Vertices[idx].x = m_Vertices[idx].ox;
 			m_Vertices[idx].y = m_Vertices[idx].oy;
@@ -161,7 +161,7 @@ void Ocean::Initialize() {
 
 void Ocean::Render(const float time, glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat) { // render function
 
-	//evaluateWavesDFT(time);
+	evaluateWavesDFT(time);
 
 	m_OceanShaderProgram.UseProgram();
 	m_OceanShaderProgram.SetMat4("u_Model", in_ModelMat);
@@ -172,8 +172,11 @@ void Ocean::Render(const float time, glm::mat4 in_ModelMat, glm::mat4 in_ViewMat
 	//glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
-	glBindVertexArray(m_GridVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_GridVBO);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(OceanVertex) * m_Vertices.size(), &m_Vertices[0]);
+	glBindVertexArray(m_GridVAO);
+	glEnableVertexAttribArray(m_PositionAttrib);
+	glVertexAttribPointer(m_PositionAttrib, 3, GL_FLOAT, GL_FALSE, sizeof(OceanVertex), (void*)0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_GridEBO);
 
 	//glBindVertexArray(0);
@@ -198,8 +201,8 @@ void Ocean::DeallocateResources() {
 // Tessendorf equation 35
 float Ocean::dispersionRelation(int32_t nPrime, int32_t mPrime) const {
 	float w_0 = 2.0f * M_PI / 200.0f; // 200.0f = T (time after which cycle will repeat, Tessendorf equation 34)
-	float kx = M_PI * (2 * nPrime - m_GridSideDimension); // / m_Length;
-	float kz = M_PI * (2 * mPrime - m_GridSideDimension); // / m_Length;
+	float kx = M_PI * (2 * nPrime - m_GridSideDimension) / m_Length;
+	float kz = M_PI * (2 * mPrime - m_GridSideDimension) / m_Length;
 	return floor(sqrt(gravityConst * sqrt(kx * kx + kz * kz)) / w_0) * w_0;
 
 }
@@ -207,8 +210,8 @@ float Ocean::dispersionRelation(int32_t nPrime, int32_t mPrime) const {
 // Tessendorf equation 40/41
 float Ocean::phillipsSpectrum(const int32_t mPrime, const int32_t nPrime) const {
 
-	const float kx = M_PI * (2 * nPrime - m_GridSideDimension); // / m_Length;
-	const float ky = M_PI * (2 * mPrime - m_GridSideDimension); // / m_Length;
+	const float kx = M_PI * (2 * nPrime - m_GridSideDimension) / m_Length;
+	const float ky = M_PI * (2 * mPrime - m_GridSideDimension) / m_Length;
 	glm::vec2 k(kx, ky);
 
 	const float kLen = glm::length(k);
@@ -242,7 +245,9 @@ std::complex<float> Ocean::hTilde_0(int32_t nPrime, int32_t mPrime) const {
 	std::normal_distribution<float> gaussNumGen(0, 1); // mean = 0; standard dev = 1
 	std::complex<float> randNum = gaussNumGen(gen);
 
-	return randNum * sqrt(phillipsSpectrum(nPrime, mPrime) / 2.0f);
+	std::complex<float> res = randNum * sqrt(phillipsSpectrum(nPrime, mPrime) / 2.0f);
+	std::cout << res << " ";
+	return res;
 
 }
 
@@ -278,10 +283,10 @@ heightDisplacementNormal Ocean::evalWaveData(glm::vec2 x, float t) {
 	float kx, kz, kLength, kDotx;
 
 	for (float m = 0; m <= m_GridSideDimension; ++m) {
-		kz = 2.0f * M_PI * (m - m_GridSideDimension / 2.0f); // / m_Length;
+		kz = 2.0f * M_PI * (m - m_GridSideDimension / 2.0f) / m_Length;
 
 		for (float n = 0; n <= m_GridSideDimension; ++n) {
-			kx = 2.0f * M_PI * (n - m_GridSideDimension / 2.0f); // / m_Length;
+			kx = 2.0f * M_PI * (n - m_GridSideDimension / 2.0f) / m_Length;
 			k = glm::vec2(kx, kz);
 
 			kLength = glm::length(k);

@@ -19,7 +19,8 @@ Engine::Engine()
     }
     std::cout << "[J] - Engine successfully initialized! \n\n";
 
-    Ocean m_Ocean = Ocean(8);
+    //0.0005f, vector2(0.0f, 32.0f)
+    Ocean m_Ocean = Ocean(16, 0.0025f, glm::vec2(0.0f, 32.0f), 16);
     m_Objects.push_back(m_Ocean);
 
 }
