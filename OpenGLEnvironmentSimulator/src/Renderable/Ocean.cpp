@@ -110,6 +110,17 @@ void Ocean::Initialize() {
 	m_OceanShaderProgram.UseProgram();
 	m_PositionAttrib = glGetAttribLocation(m_OceanShaderProgram.getID(), "inV_Pos");
 
+	//std::vector<float> vertices;
+	//for (int i = 0; i < m_Vertices.size(); i++) {
+	//	vertices.push_back(m_Vertices[i].x);
+	//	vertices.push_back(m_Vertices[i].y);
+	//	vertices.push_back(m_Vertices[i].z);
+	//}
+	//std::vector<uint32_t> indices;
+	//for (int i = 0; i < m_Indices.size(); i++) {
+	//	indices.push_back(m_Indices[i]);
+	//}
+
 	// generate and bind grid VBO, VAO, and EBO
 	glGenBuffers(1, &m_GridVBO);
 	glGenBuffers(1, &m_GridEBO);
@@ -124,22 +135,11 @@ void Ocean::Initialize() {
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_Indices[0]) * m_Indices.size(), &m_Indices[0], GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(m_PositionAttrib);
-	glVertexAttribPointer(m_PositionAttrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	
+	glVertexAttribPointer(m_PositionAttrib, 3, GL_FLOAT, GL_FALSE, sizeof(OceanVertex), (void*)0);
+
 	std::cout << "[J] - Ocean object successfully initialized! \n\n";
 	
-	
-	std::vector<float> vertices;
-	for (int i = 0; i < m_Vertices.size(); i++) {
-		vertices.push_back(m_Vertices[i].x);
-		vertices.push_back(m_Vertices[i].y);
-		vertices.push_back(m_Vertices[i].z);
-	}
-	std::vector<uint32_t> indices;
-	for (int i = 0; i < m_Indices.size(); i++) {
-		indices.push_back(m_Indices[i]);
-	}
-	
+	/*
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
 	glGenVertexArrays(1, &VAO);
@@ -154,25 +154,8 @@ void Ocean::Initialize() {
 
 	glEnableVertexAttribArray(m_PositionAttrib);
 	glVertexAttribPointer(m_PositionAttrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	*/
 	
-	//std::cout << "TEST VERTICES: \n";
-	//for (int i = 0; i < vertices.size(); i++) {
-	//	std::cout << vertices[i] << ", ";
-	//	if (i % 3 == 0) std::cout << "\n";
-	//}
-	//std::cout << "TEST INDICES: \n";
-	//for (int i = 0; i < indices.size(); i++) {
-	//	std::cout << indices[i] << ", ";
-	//	if (i % 3 == 0) std::cout << "\n";
-	//}
-	//std::cout << "VERTICES: \n";
-	//for (int i = 0; i < m_Vertices.size(); i++) {
-	//	std::cout << m_Vertices[i].x << ", " << m_Vertices[i].y << ", " << m_Vertices[i].z << ", \n";
-	//}
-	//std::cout << "INDICES: \n";
-	//for (int i = 0; i < m_Indices.size(); i++) {
-	//	printUVec3(m_Indices[i]);
-	//}
 	
 }
 
@@ -185,9 +168,17 @@ void Ocean::Render(const float time, glm::mat4 in_ModelMat, glm::mat4 in_ViewMat
 	m_OceanShaderProgram.SetMat4("u_View", in_ViewMat);
 	m_OceanShaderProgram.SetMat4("u_Projection", in_ProjeMat);
 
+	//glBindVertexArray(VAO);
+	//glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+
 	glBindVertexArray(m_GridVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_GridVBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_GridEBO);
+
+	//glBindVertexArray(0);
+	//glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	//glDrawArrays(GL_TRIANGLES, 0, 1 * 3);
 	glDrawElements(GL_TRIANGLES, m_Indices.size() * 3, GL_UNSIGNED_INT, 0);
@@ -196,9 +187,9 @@ void Ocean::Render(const float time, glm::mat4 in_ModelMat, glm::mat4 in_ViewMat
 
 void Ocean::DeallocateResources() {
 
-	glDeleteVertexArrays(1, &m_GridVBO);
-	glDeleteBuffers(1, &m_GridVAO);
-	glDeleteBuffers(1, &m_GridEBO);
+	//glDeleteVertexArrays(1, &m_GridVBO);
+	//glDeleteBuffers(1, &m_GridVAO);
+	//glDeleteBuffers(1, &m_GridEBO);
 
 }
 
@@ -403,5 +394,22 @@ void Ocean::evaluateWavesDFT(float time) {
 //
 //}
 
-
+//std::cout << "TEST VERTICES: \n";
+	//for (int i = 0; i < vertices.size(); i++) {
+	//	std::cout << vertices[i] << ", ";
+	//	if (i % 3 == 0) std::cout << "\n";
+	//}
+	//std::cout << "TEST INDICES: \n";
+	//for (int i = 0; i < indices.size(); i++) {
+	//	std::cout << indices[i] << ", ";
+	//	if (i % 3 == 0) std::cout << "\n";
+	//}
+	//std::cout << "VERTICES: \n";
+	//for (int i = 0; i < m_Vertices.size(); i++) {
+	//	std::cout << m_Vertices[i].x << ", " << m_Vertices[i].y << ", " << m_Vertices[i].z << ", \n";
+	//}
+	//std::cout << "INDICES: \n";
+	//for (int i = 0; i < m_Indices.size(); i++) {
+	//	printUVec3(m_Indices[i]);
+	//}
 

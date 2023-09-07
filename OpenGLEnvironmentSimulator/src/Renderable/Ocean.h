@@ -6,7 +6,8 @@
 //		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 //		glClearColor(0.05f, 0.2f, 0.3f, 1.0f);
 // to the Update() function?
-//
+// update 9/6 - i think the destructor is being called??? like when its not supposed to
+// which is why m_GridVBO wont render but VBO will
 
 #include "Renderable.h"
 
