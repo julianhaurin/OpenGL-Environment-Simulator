@@ -16,7 +16,7 @@ Camera::Camera(glm::vec3 position, glm::vec3 worldUp, float yaw, float pitch)
 	updateCameraVectors();
 }
 
-void Camera::ProcessKeyboardInput(CameraMovement in_Direction, float deltaTime) {
+void Camera::ProcessKeyboardInput(const CameraMovement in_Direction, const float deltaTime) {
 	const float velocity = m_Speed * deltaTime;
 
 	if (in_Direction == Forwards)
@@ -33,14 +33,29 @@ void Camera::ProcessKeyboardInput(CameraMovement in_Direction, float deltaTime) 
 	if (in_Direction == Down)
 		m_Position -= m_Up * velocity;
 
+	if (in_Direction == YawLeft)
+		m_Yaw -= velocity * 10.0f;
+	else if (in_Direction == YawRight)
+		m_Yaw += velocity * 10.0f;
+	else if (in_Direction == PitchUp)
+		m_Pitch += velocity * 10.0f;
+	else if (in_Direction == PitchDown)
+		m_Pitch -= velocity * 10.0f;
+
+	// constrains camera pitch angle
+	if (m_Pitch > 89.9f)
+		m_Pitch = 89.9f;
+	if (m_Pitch < -89.9f)
+		m_Pitch = -89.9f;
+
+	updateCameraVectors();
+
 }
 
-void Camera::ProcessMouseInput(float in_xOffset, float in_yOffset, bool in_ConstrainPitch) {
-	in_xOffset *= m_MouseSensitivity;
-	in_yOffset *= m_MouseSensitivity;
-
-	m_Yaw += in_xOffset;
-	m_Pitch += in_yOffset;
+void Camera::ProcessMouseInput(const float in_xOffset, const float in_yOffset, const bool in_ConstrainPitch) {
+	
+	m_Yaw += in_xOffset * m_MouseSensitivity;
+	m_Pitch += in_yOffset * m_MouseSensitivity;
 
 	if (in_ConstrainPitch == true) {
 		if (m_Pitch > 89.9f)
@@ -69,6 +84,7 @@ float Camera::getZoom() const {
 
 }
 
+// recalculates camera member variables when needed
 void Camera::updateCameraVectors() {
 	glm::vec3 front;
 	front.x = cos(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
