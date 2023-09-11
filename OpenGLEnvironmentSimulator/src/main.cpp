@@ -6,12 +6,12 @@
 // add override keyword bum
 // 
 
-#include "Engine.h"
+#include "Renderer.h"
 
 int main() 
 {
 
-	Engine Monke = Engine();
+	Renderer Monke = Renderer();
 	Monke.Run();
 	return EXIT_SUCCESS;
 

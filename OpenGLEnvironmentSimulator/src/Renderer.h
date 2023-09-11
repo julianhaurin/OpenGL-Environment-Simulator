@@ -2,10 +2,9 @@
 #pragma once
 
 // Notes:
-// very simple for now, just trying to abstract info from main file into 
-// cohesive element - lots of optimizing and updating to do
+// lots of optimizing and updating to do
 //
-// should the opengl context (glfw/glew) be created within the engine or outside?
+// should the opengl context (glfw/glew) be created within the Renderer or outside?
 // fix error handling in inititalize function ***
 //
 // glfw callback function workaround stackoverflow.com/questions/7676971/pointing-to-a-function-that-is-a-class-member-glfw-setkeycallback
@@ -23,18 +22,18 @@
 
 #include "Camera/Camera.h"
 #include "Renderable/Ocean.h"
-#include "utility.h"
+#include "Utility/utility.h"
 
 // represents an OpenGL context and scene
-class Engine 
+class Renderer 
 {
 public:
 	// initial window dimensions //
 	static const uint32_t ScreenHeight;
 	static const uint32_t ScreenWidth;
 
-	Engine();
-	~Engine();
+	Renderer();
+	~Renderer();
 
 	// render loop
 	void Run();
@@ -67,3 +66,4 @@ private:
 //// GLFW callback functions //
 //void glfwMouseCallback(double in_xPos, double in_yPos);
 //void glfwScrollCallback(double xoffset, double yoffset);
+

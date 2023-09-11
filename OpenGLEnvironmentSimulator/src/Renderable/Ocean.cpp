@@ -10,6 +10,9 @@
 // mPrime and nPrime are now values within range [0, M] and [0, N] respectively, 
 // and are converted to proper ranges within functions when necessary
 
+// add more comments
+// change pi
+
 
 #include "Ocean.h"
 
@@ -26,9 +29,21 @@ void printUVec3(glm::uvec3 vec) {
 // initializes vertices and indices vectors and creates ocean shader program
 Ocean::Ocean(const uint32_t gridDimensions, const float waveHeight_A, glm::vec2 windDir_w, const float length)
 	: m_GridSideDimension(gridDimensions), m_phillipsConstant_A(waveHeight_A), m_windDir_w(windDir_w), m_Length(length),
-	  m_OceanShaderProgram(ShaderProgram("./shaders/oceanVertShader.glsl", "./shaders/oceanFragShader.glsl"))
+	  m_OceanShaderProgram(ShaderProgram("./shaders/oceanVertShader.glsl", "./shaders/oceanFragShader.glsl")),
+	  // FFT
+	  m_FFT(FFT(m_GridSideDimension)), 
+	  m_HTilde(std::vector<std::complex<float>>(m_GridSideDimension * m_GridSideDimension)),
+	  m_HTildeSlopeX(std::vector<std::complex<float>>(m_GridSideDimension * m_GridSideDimension)),
+	  m_HTildeSlopeZ(std::vector<std::complex<float>>(m_GridSideDimension * m_GridSideDimension)),
+	  m_HTildeDX(std::vector<std::complex<float>>(m_GridSideDimension * m_GridSideDimension)),
+	  m_HTildeDZ(std::vector<std::complex<float>>(m_GridSideDimension * m_GridSideDimension)),
+	  // Pocket FFT
+	  m_PFFT_shape(static_cast<pocketfft::shape_t>(m_GridSideDimension)),
+	  m_PFFT_stride(sizeof(float))
 {
 	assert(m_GridSideDimension && !(m_GridSideDimension & (m_GridSideDimension - 1))); // m_GridSideDimension == power of 2
+
+	//std::cout << "Ocean Constructor \n";
 
 	const uint32_t sidePlus1 = m_GridSideDimension + 1;  // one greater than grid dimension for tiling purposes
 	const uint32_t verticesCount = sidePlus1 * sidePlus1;
@@ -109,6 +124,7 @@ void Ocean::Initialize() {
 
 	m_OceanShaderProgram.UseProgram();
 	m_PositionAttrib = glGetAttribLocation(m_OceanShaderProgram.getID(), "inV_Pos");
+	m_NormalAttrib = glGetAttribLocation(m_OceanShaderProgram.getID(), "inV_Norm");
 
 	//std::vector<float> vertices;
 	//for (int i = 0; i < m_Vertices.size(); i++) {
@@ -135,7 +151,11 @@ void Ocean::Initialize() {
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_Indices[0]) * m_Indices.size(), &m_Indices[0], GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(m_PositionAttrib);
-	glVertexAttribPointer(m_PositionAttrib, 3, GL_FLOAT, GL_FALSE, sizeof(OceanVertex), (void*)0);
+	glVertexAttribPointer(m_PositionAttrib, 3, GL_FLOAT, GL_FALSE, sizeof(OceanVertex), (GLvoid*)0);
+
+	GLintptr vertexPositionOffset = 6 * sizeof(GLfloat);
+	glEnableVertexAttribArray(m_NormalAttrib);
+	glVertexAttribPointer(m_NormalAttrib, 3, GL_FLOAT, GL_FALSE, sizeof(OceanVertex), (GLvoid*)vertexPositionOffset);
 
 	std::cout << "[J] - Ocean object successfully initialized! \n\n";
 	
@@ -159,15 +179,21 @@ void Ocean::Initialize() {
 	
 }
 
-void Ocean::Render(const float time, glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat) { // render function
+void Ocean::Render(const float time, glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat, glm::vec3 in_LightPos) { // render function
 
-	evaluateWavesDFT(time);
+	EvaluateWavesDFT(time);
+	//EvaluateWavesFFT(time);
 
 	m_OceanShaderProgram.UseProgram();
 	m_OceanShaderProgram.SetMat4("u_Model", in_ModelMat);
 	m_OceanShaderProgram.SetMat4("u_View", in_ViewMat);
 	m_OceanShaderProgram.SetMat4("u_Projection", in_ProjeMat);
 
+	m_OceanShaderProgram.SetFloat("u_AmbientStrength", 0.25f);
+	m_OceanShaderProgram.SetVec3("u_OceanColor", glm::vec3(0.0f, 0.2f, 0.2f));
+	m_OceanShaderProgram.SetVec3("u_LightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+	m_OceanShaderProgram.SetVec3("u_LightPos", in_LightPos);
+	
 	//glBindVertexArray(VAO);
 	//glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
@@ -175,8 +201,12 @@ void Ocean::Render(const float time, glm::mat4 in_ModelMat, glm::mat4 in_ViewMat
 	glBindBuffer(GL_ARRAY_BUFFER, m_GridVBO);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(OceanVertex) * m_Vertices.size(), &m_Vertices[0]);
 	glBindVertexArray(m_GridVAO);
+
 	glEnableVertexAttribArray(m_PositionAttrib);
-	glVertexAttribPointer(m_PositionAttrib, 3, GL_FLOAT, GL_FALSE, sizeof(OceanVertex), (void*)0);
+	glVertexAttribPointer(m_PositionAttrib, 3, GL_FLOAT, GL_FALSE, sizeof(OceanVertex), (GLvoid*)0);
+	GLintptr vertexPositionOffset = 6 * sizeof(GLfloat);
+	glEnableVertexAttribArray(m_NormalAttrib);
+	glVertexAttribPointer(m_NormalAttrib, 3, GL_FLOAT, GL_FALSE, sizeof(OceanVertex), (GLvoid*)vertexPositionOffset);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_GridEBO);
 
 	//glBindVertexArray(0);
@@ -246,7 +276,6 @@ std::complex<float> Ocean::hTilde_0(int32_t nPrime, int32_t mPrime) const {
 	std::complex<float> randNum = gaussNumGen(gen);
 
 	std::complex<float> res = randNum * sqrt(phillipsSpectrum(nPrime, mPrime) / 2.0f);
-	std::cout << res << " ";
 	return res;
 
 }
@@ -315,7 +344,7 @@ heightDisplacementNormal Ocean::evalWaveData(glm::vec2 x, float t) {
 
 }
 
-void Ocean::evaluateWavesDFT(float time) {
+void Ocean::EvaluateWavesDFT(const float time) {
 
 	float lambda = -1.0f;
 	glm::vec2 x;
@@ -329,7 +358,6 @@ void Ocean::evaluateWavesDFT(float time) {
 	for (float m = 0; m < N; ++m) {
 		for (float n = 0; n < N; ++n) {
 			index = m * Nplus1 + n;
-
 			
 			x = glm::vec2(m_Vertices[index].x, m_Vertices[index].z);
 
@@ -379,6 +407,158 @@ void Ocean::evaluateWavesDFT(float time) {
 	}
 
 }
+
+void Ocean::EvaluateWavesFFT(const float time) {
+
+	float kx, kz, len, lambda = -1.0f;
+	uint32_t index, index1;
+
+	const uint32_t N = m_GridSideDimension;
+	const uint32_t Nplus1 = N + 1;
+
+	for (int m_prime = 0; m_prime < N; m_prime++) {
+		kz = M_PI * (2.0f * m_prime - N) / m_Length;
+		for (int n_prime = 0; n_prime < N; n_prime++) {
+			kx = M_PI * (2 * n_prime - N) / m_Length;
+			len = sqrt(kx * kx + kz * kz);
+			index = m_prime * N + n_prime;
+
+			m_HTilde[index] = hTilde(time, n_prime, m_prime);
+			m_HTildeSlopeX[index] = m_HTilde[index] * std::complex<float>(0, kx);
+			m_HTildeSlopeZ[index] = m_HTilde[index] * std::complex<float>(0, kz);
+			if (len < 0.000001f) {
+				m_HTildeDX[index] = std::complex<float>(0.0f, 0.0f);
+				m_HTildeDZ[index] = std::complex<float>(0.0f, 0.0f);
+			}
+			else {
+				m_HTildeDX[index] = m_HTilde[index] * std::complex<float>(0, -kx / len);
+				m_HTildeDZ[index] = m_HTilde[index] * std::complex<float>(0, -kz / len);
+			}
+		}
+	}
+
+	//template<typename T> void c2c(
+	//  const shape_t & shape, 
+	//  const stride_t & stride_in,
+	//	const stride_t & stride_out, 
+	//  const shape_t & axes, 
+	//  bool forward,
+	//	const std::complex<T>*data_in, 
+	//  std::complex<T>*data_out, 
+	//  T fct,
+	//	size_t nthreads = 1)
+
+	for (int m_prime = 0; m_prime < N; m_prime++) {
+		//m_PGFFT.apply(&m_HTilde[0], &m_HTilde[0]);
+		//m_PGFFT.apply(&m_HTildeSlopeX[0], &m_HTildeSlopeX[0]);
+		//m_PGFFT.apply(&m_HTildeSlopeZ[0], &m_HTildeSlopeZ[0]);
+		//m_PGFFT.apply(&m_HTildeDX[0], &m_HTildeDX[0]);
+		//m_PGFFT.apply(&m_HTildeDZ[0], &m_HTildeDZ[0]);
+
+		pocketfft::c2c(m_PFFT_shape, m_PFFT_stride, m_PFFT_stride, m_PFFT_shape, pocketfft::FORWARD, &m_HTilde[0], &m_HTilde[0], 1.0f, 1);
+		pocketfft::c2c(m_PFFT_shape, m_PFFT_stride, m_PFFT_stride, m_PFFT_shape, pocketfft::FORWARD, &m_HTildeSlopeX[0], &m_HTildeSlopeX[0], 1.0f, 1);
+		pocketfft::c2c(m_PFFT_shape, m_PFFT_stride, m_PFFT_stride, m_PFFT_shape, pocketfft::FORWARD, &m_HTildeSlopeZ[0], &m_HTildeSlopeZ[0], 1.0f, 1);
+		pocketfft::c2c(m_PFFT_shape, m_PFFT_stride, m_PFFT_stride, m_PFFT_shape, pocketfft::FORWARD, &m_HTildeDX[0], &m_HTildeDX[0], 1.0f, 1);
+		pocketfft::c2c(m_PFFT_shape, m_PFFT_stride, m_PFFT_stride, m_PFFT_shape, pocketfft::FORWARD, &m_HTildeDZ[0], &m_HTildeDZ[0], 1.0f, 1);
+
+		//m_FFT.ComputeFFT(m_HTilde, m_HTilde, 1, m_prime * N);
+		//m_FFT.ComputeFFT(m_HTildeSlopeX, m_HTildeSlopeX, 1, m_prime * N);
+		//m_FFT.ComputeFFT(m_HTildeSlopeZ, m_HTildeSlopeZ, 1, m_prime * N);
+		//m_FFT.ComputeFFT(m_HTildeDX, m_HTildeDX, 1, m_prime * N);
+		//m_FFT.ComputeFFT(m_HTildeDZ, m_HTildeDZ, 1, m_prime * N);
+	}
+	for (int n_prime = 0; n_prime < N; n_prime++) {
+		//m_PGFFT.apply(&m_HTilde[0], &m_HTilde[0]);
+		//m_PGFFT.apply(&m_HTildeSlopeX[0], &m_HTildeSlopeX[0]);
+		//m_PGFFT.apply(&m_HTildeSlopeZ[0], &m_HTildeSlopeZ[0]);
+		//m_PGFFT.apply(&m_HTildeDX[0], &m_HTildeDX[0]);
+		//m_PGFFT.apply(&m_HTildeDZ[0], &m_HTildeDZ[0]);
+
+		pocketfft::c2c(m_PFFT_shape, m_PFFT_stride, m_PFFT_stride, m_PFFT_shape, pocketfft::FORWARD, &m_HTilde[0], &m_HTilde[0], 1.0f, 1);
+		pocketfft::c2c(m_PFFT_shape, m_PFFT_stride, m_PFFT_stride, m_PFFT_shape, pocketfft::FORWARD, &m_HTildeSlopeX[0], &m_HTildeSlopeX[0], 1.0f, 1);
+		pocketfft::c2c(m_PFFT_shape, m_PFFT_stride, m_PFFT_stride, m_PFFT_shape, pocketfft::FORWARD, &m_HTildeSlopeZ[0], &m_HTildeSlopeZ[0], 1.0f, 1);
+		pocketfft::c2c(m_PFFT_shape, m_PFFT_stride, m_PFFT_stride, m_PFFT_shape, pocketfft::FORWARD, &m_HTildeDX[0], &m_HTildeDX[0], 1.0f, 1);
+		pocketfft::c2c(m_PFFT_shape, m_PFFT_stride, m_PFFT_stride, m_PFFT_shape, pocketfft::FORWARD, &m_HTildeDZ[0], &m_HTildeDZ[0], 1.0f, 1);
+
+		//m_FFT.ComputeFFT(m_HTilde, m_HTilde, N, n_prime);
+		//m_FFT.ComputeFFT(m_HTildeSlopeX, m_HTildeSlopeX, N, n_prime);
+		//m_FFT.ComputeFFT(m_HTildeSlopeZ, m_HTildeSlopeZ, N, n_prime);
+		//m_FFT.ComputeFFT(m_HTildeDX, m_HTildeDX, N, n_prime);
+		//m_FFT.ComputeFFT(m_HTildeDZ, m_HTildeDZ, N, n_prime);
+	}
+
+	int sign;
+	float signs[] = { 1.0f, -1.0f };
+	glm::vec3 n;
+	for (int m_prime = 0; m_prime < N; m_prime++) {
+		for (int n_prime = 0; n_prime < N; n_prime++) {
+			index = m_prime * N + n_prime;     // index into m_HTilde..
+			index1 = m_prime * Nplus1 + n_prime;    // index into vertices
+
+			sign = signs[(n_prime + m_prime) & 1];
+
+			m_HTilde[index].real(m_HTilde[index].real() * sign);
+			m_HTilde[index].imag(m_HTilde[index].imag() * sign);
+
+			// height
+			m_Vertices[index1].y = m_HTilde[index].real();
+
+			// displacement
+			m_HTildeDX[index].real(m_HTildeDX[index].real() * sign);
+			m_HTildeDX[index].imag(m_HTildeDX[index].imag() * sign);
+			m_HTildeDZ[index].real(m_HTildeDZ[index].real() * sign);
+			m_HTildeDZ[index].imag(m_HTildeDZ[index].imag() * sign);
+
+			m_Vertices[index1].x = m_Vertices[index1].ox + m_HTildeDX[index].real() * lambda;
+			m_Vertices[index1].z = m_Vertices[index1].oz + m_HTildeDZ[index].real() * lambda;
+
+			// normal
+			m_HTildeSlopeX[index].real(m_HTildeSlopeX[index].real() * sign);
+			m_HTildeSlopeX[index].imag(m_HTildeSlopeX[index].imag() * sign);
+			m_HTildeSlopeZ[index].real(m_HTildeSlopeZ[index].real() * sign);
+			m_HTildeSlopeZ[index].imag(m_HTildeSlopeZ[index].imag() * sign);
+
+			n = glm::normalize(glm::vec3(0.0f - m_HTildeSlopeX[index].real(), 1.0f, 0.0f - m_HTildeSlopeZ[index].real()));
+			m_Vertices[index1].nx = n.x;
+			m_Vertices[index1].ny = n.y;
+			m_Vertices[index1].nz = n.z;
+
+			// for tiling
+			if (n_prime == 0 && m_prime == 0) {
+				m_Vertices[index1 + N + Nplus1 * N].y = m_HTilde[index].real();
+
+				m_Vertices[index1 + N + Nplus1 * N].x = m_Vertices[index1 + N + Nplus1 * N].ox + m_HTildeDX[index].real() * lambda;
+				m_Vertices[index1 + N + Nplus1 * N].z = m_Vertices[index1 + N + Nplus1 * N].oz + m_HTildeDZ[index].real() * lambda;
+
+				m_Vertices[index1 + N + Nplus1 * N].nx = n.x;
+				m_Vertices[index1 + N + Nplus1 * N].ny = n.y;
+				m_Vertices[index1 + N + Nplus1 * N].nz = n.z;
+			}
+			if (n_prime == 0) {
+				m_Vertices[index1 + N].y = m_HTilde[index].real();
+
+				m_Vertices[index1 + N].x = m_Vertices[index1 + N].ox + m_HTildeDX[index].real() * lambda;
+				m_Vertices[index1 + N].z = m_Vertices[index1 + N].oz + m_HTildeDZ[index].real() * lambda;
+
+				m_Vertices[index1 + N].nx = n.x;
+				m_Vertices[index1 + N].ny = n.y;
+				m_Vertices[index1 + N].nz = n.z;
+			}
+			if (m_prime == 0) {
+				m_Vertices[index1 + Nplus1 * N].y = m_HTilde[index].real();
+
+				m_Vertices[index1 + Nplus1 * N].x = m_Vertices[index1 + Nplus1 * N].ox + m_HTildeDX[index].real() * lambda;
+				m_Vertices[index1 + Nplus1 * N].z = m_Vertices[index1 + Nplus1 * N].oz + m_HTildeDZ[index].real() * lambda;
+
+				m_Vertices[index1 + Nplus1 * N].nx = n.x;
+				m_Vertices[index1 + Nplus1 * N].ny = n.y;
+				m_Vertices[index1 + Nplus1 * N].nz = n.z;
+			}
+		}
+	}
+
+}
+
 
 // ***** DEPRECATED *****
 //float uniformRandomVariable() {

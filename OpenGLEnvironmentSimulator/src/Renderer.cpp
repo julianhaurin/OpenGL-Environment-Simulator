@@ -1,39 +1,39 @@
 
-#include "Engine.h"
+#include "Renderer.h"
 
-const uint32_t Engine::ScreenHeight = 600;
-const uint32_t Engine::ScreenWidth = 800;
+const uint32_t Renderer::ScreenHeight = 600;
+const uint32_t Renderer::ScreenWidth = 800;
 
 // Public Methods ------------------------------ //
 
-Engine::Engine()
-    : m_Camera(Camera(glm::vec3(0.0f, 0.0f, 5.0f))),
+Renderer::Renderer()
+    : m_Camera(Camera(glm::vec3(0.0f, 5.0f, 5.0f))),
     m_deltaTime(0.0f), m_lastFrame(0.0f),
     m_lastY(ScreenHeight / 2.0f), m_lastX(ScreenWidth / 2.0f)
 {
 
     // initializes GLFW, creates OpenGL context and GLFW window, initializes GLEW //
     if (Initialize() != true) {
-        std::cout << "[J] - ERROR: Engine failed to initialize \n";
+        std::cout << "[J] - ERROR: Renderer failed to initialize \n";
         return; // lol bruh
     }
-    std::cout << "[J] - Engine successfully initialized! \n\n";
+    std::cout << "[J] - Renderer successfully initialized! \n\n";
 
-    //0.0005f, vector2(0.0f, 32.0f)
-    Ocean m_Ocean = Ocean(16, 0.0025f, glm::vec2(0.0f, 32.0f), 16);
+    Ocean m_Ocean = Ocean(16, 0.0025f, glm::vec2(32.0f, 32.0f), 32);
     m_Objects.push_back(m_Ocean);
 
 }
 
-Engine::~Engine()
+Renderer::~Renderer()
 {
     glfwCleanUp(m_Window);
 }
 
 // render loop
-void Engine::Run() {
+void Renderer::Run() {
 
     std::cout << "[J] - Beginning render loop... \n";
+    glm::vec3 lightPos(0.0f, -10.0f, 50.0f);
 
     while (glfwWindowShouldClose(m_Window) == false)
     {
@@ -54,9 +54,9 @@ void Engine::Run() {
 
         // render
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glClearColor(0.05f, 0.15f, 0.25f, 1.0f); // background color
+        glClearColor(0.01f, 0.01f, 0.01f, 1.0f); // background color
 
-        m_Objects[0].Render(currentFrame, model, view, projection);
+        m_Objects[0].Render(currentFrame, model, view, projection, lightPos);
 
         glfwSwapBuffers(m_Window);
         glfwPollEvents();
@@ -67,9 +67,9 @@ void Engine::Run() {
 // Private Methods ----------------------------- //
 
 // initializes GLFW and creates a GLFW window and OpenGL context, initializes GLEW
-bool Engine::Initialize() {
+bool Renderer::Initialize() {
 
-    std::cout << "[J] - Initializing Engine... \n";
+    std::cout << "[J] - Initializing Renderer... \n";
 
     // initializes GLFW and returns a valid GLFWwindow* on success
     m_Window = setupGLFWWindow(ScreenWidth, ScreenHeight);
@@ -103,7 +103,7 @@ bool Engine::Initialize() {
 }
 
 // Initiliazes GLFW and returns a pointer to the current GLFW window
-GLFWwindow* Engine::setupGLFWWindow(const uint32_t screenWidth, const uint32_t screenHeight) {
+GLFWwindow* Renderer::setupGLFWWindow(const uint32_t screenWidth, const uint32_t screenHeight) {
 
     if (glfwInit() == GLFW_FALSE) {
         std::cout << "[J] - ERROR: GLFW failed to initialize\n";
@@ -130,7 +130,7 @@ GLFWwindow* Engine::setupGLFWWindow(const uint32_t screenWidth, const uint32_t s
 }
 
 // processes keyboard inputs
-void Engine::processKeyboardInputs() {
+void Renderer::processKeyboardInputs() {
 
     if (glfwGetKey(m_Window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(m_Window, true);
@@ -168,19 +168,14 @@ void Engine::processKeyboardInputs() {
 }
 
 // deallocates glfw resources
-void Engine::glfwCleanUp(GLFWwindow* window) {
+void Renderer::glfwCleanUp(GLFWwindow* window) {
     glfwDestroyWindow(window);
     glfwTerminate();
 
 }
 
-
-
-
-
-
 //// GLFW callback functions //
-//void Engine::glfwMouseCallback(double in_xPos, double in_yPos) {
+//void Renderer::glfwMouseCallback(double in_xPos, double in_yPos) {
 //    const float xPos = static_cast<float>(in_xPos);
 //    const float yPos = static_cast<float>(in_yPos);
 //
@@ -193,7 +188,7 @@ void Engine::glfwCleanUp(GLFWwindow* window) {
 //    m_Camera.ProcessMouseInput(xOffset, yOffset);
 //}
 //
-//void Engine::glfwScrollCallback(double xoffset, double yoffset) {
+//void Renderer::glfwScrollCallback(double xoffset, double yoffset) {
 //    m_Camera.ProcessMouseScroll(static_cast<float>(yoffset));
 //
 //}

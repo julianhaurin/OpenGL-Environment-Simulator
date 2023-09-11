@@ -8,6 +8,7 @@
 // to the Update() function?
 // update 9/6 - i think the destructor is being called??? like when its not supposed to
 // which is why m_GridVBO wont render but VBO will
+// could also use pocketfft or kissfft or fftw
 
 #include "Renderable.h"
 
@@ -28,6 +29,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+//#include "../Utility/PGFFT/PGFFT.h"
+#include "../Utility/PocketFFT/PocketFFT.h"
+
+#include "../Utility/FFT.h"
 #include "../ShaderHandlers/ShaderProgram.h"
 
 // data within ocean grid vertex
@@ -56,15 +61,19 @@ public:
 	Ocean(const uint32_t gridDimensions = 8, const float waveHeight_A = 1.0f, glm::vec2 windDir_w = glm::vec2(1.0f, 1.0f), const float length = 8);
 	~Ocean();
 
-	void Render(const float time, glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat) override;
+	void Render(const float time, glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat, glm::vec3 in_LightPos) override;
 
 private:
 	// shader program
 	ShaderProgram m_OceanShaderProgram;
 
+	GLuint m_GridVBO;
+	GLuint m_GridVAO;
+	GLuint m_GridEBO;
+
 	// shader attribute locations
 	GLint m_PositionAttrib;
-	//GLint m_NormalAttrib;
+	GLint m_NormalAttrib;
 	//GLint m_TextureAttrib;
 
 	// grid vertices and indices (VBO and EBO data)
@@ -77,9 +86,17 @@ private:
 	const glm::vec2 m_windDir_w;
 	const float m_Length;
 
-	GLuint m_GridVBO;
-	GLuint m_GridVAO;
-	GLuint m_GridEBO;
+	// FFT data
+	FFT m_FFT;
+	std::vector<std::complex<float>> m_HTilde;
+	std::vector<std::complex<float>> m_HTildeSlopeX;
+	std::vector<std::complex<float>> m_HTildeSlopeZ;
+	std::vector<std::complex<float>> m_HTildeDX;
+	std::vector<std::complex<float>> m_HTildeDZ;
+
+	// PocketFFT
+	const pocketfft::shape_t m_PFFT_shape;
+	const pocketfft::stride_t m_PFFT_stride;
 
 	void Initialize();
 	void DeallocateResources();
@@ -91,7 +108,9 @@ private:
 	std::complex<float> hTilde(const float t, const int32_t nPrime, const int32_t mPrime) const;
 
 	heightDisplacementNormal evalWaveData(glm::vec2 x, float time);
-	void evaluateWavesDFT(float time); // evaluates new wave height
+	// evaluates new wave height
+	void EvaluateWavesDFT(const float time); // discrete fourier transform
+	void EvaluateWavesFFT(const float time); // fast fourier transform
 
 	// test stuff
 	GLuint VBO, EBO, VAO;
