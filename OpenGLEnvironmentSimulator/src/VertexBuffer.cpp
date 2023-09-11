@@ -5,22 +5,29 @@
 
 // Public Methods //
 
-VertexBuffer::VertexBuffer() {
+VertexBuffer::VertexBuffer(const std::vector<GLfloat> in_VertexData) {
+
+	glGenBuffers(1, &m_ID);
+	Bind();
+	glBufferData(GL_ARRAY_BUFFER, sizeof(in_VertexData[0]) * in_VertexData.size(), &in_VertexData[0], GL_STATIC_DRAW);
 
 }
 
 VertexBuffer::~VertexBuffer() {
 
+	glDeleteVertexArrays(1, &m_ID);
+
 }
 
 // Private Methods //
 
-bool VertexBuffer::Bind() {
+void VertexBuffer::Bind() const {
+	glBindBuffer(GL_ARRAY_BUFFER, m_ID);
 
 }
 
-bool VertexBuffer::Unbind() {
-
+void VertexBuffer::Unbind() const {
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 }
 

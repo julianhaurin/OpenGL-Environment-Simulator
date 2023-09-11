@@ -145,10 +145,10 @@ void Ocean::Initialize() {
 	glBindVertexArray(m_GridVAO);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_GridVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(m_Vertices[0]) * m_Vertices.size(), &m_Vertices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(m_Vertices[0]) * m_Vertices.size(), &m_Vertices[0], GL_DYNAMIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_GridEBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_Indices[0]) * m_Indices.size(), &m_Indices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_Indices[0]) * m_Indices.size(), &m_Indices[0], GL_DYNAMIC_DRAW);
 
 	glEnableVertexAttribArray(m_PositionAttrib);
 	glVertexAttribPointer(m_PositionAttrib, 3, GL_FLOAT, GL_FALSE, sizeof(OceanVertex), (GLvoid*)0);
