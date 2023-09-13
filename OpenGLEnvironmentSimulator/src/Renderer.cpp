@@ -7,9 +7,9 @@ const uint32_t Renderer::ScreenWidth = 800;
 // Public Methods ------------------------------ //
 
 Renderer::Renderer()
-    : m_Camera(Camera(glm::vec3(0.0f, 5.0f, 5.0f))),
-    m_deltaTime(0.0f), m_lastFrame(0.0f),
-    m_lastY(ScreenHeight / 2.0f), m_lastX(ScreenWidth / 2.0f)
+    : m_Camera(Camera(glm::vec3(-40.0f, 48.0f, 34.0f), glm::vec3(0.0f, 1.0f, 0.0f), -41.0f, -42.5f)),
+      m_deltaTime(0.0f), m_lastFrame(0.0f),
+      m_lastY(ScreenHeight / 2.0f), m_lastX(ScreenWidth / 2.0f)
 {
 
     // initializes GLFW, creates OpenGL context and GLFW window, initializes GLEW //
@@ -19,7 +19,7 @@ Renderer::Renderer()
     }
     std::cout << "[J] - Renderer successfully initialized! \n\n";
 
-    Ocean m_Ocean = Ocean(16, 0.0025f, glm::vec2(32.0f, 32.0f), 32);
+    Ocean m_Ocean = Ocean(32, 0.0025f, glm::vec2(32.0f, 16.0f), 32);
     m_Objects.push_back(m_Ocean);
 
 }
@@ -33,11 +33,11 @@ Renderer::~Renderer()
 void Renderer::Run() {
 
     std::cout << "[J] - Beginning render loop... \n";
-    glm::vec3 lightPos(0.0f, -10.0f, 50.0f);
+    glm::vec3 lightPos(0.0f, 1.0f, 10.0f);
 
     while (glfwWindowShouldClose(m_Window) == false)
     {
-        float currentFrame = static_cast<float>(glfwGetTime());
+        float currentFrame = m_lastFrame + 0.1f; // static_cast<float>(glfwGetTime());
         m_deltaTime = currentFrame - m_lastFrame;
         m_lastFrame = currentFrame;
 
@@ -56,10 +56,13 @@ void Renderer::Run() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(0.01f, 0.01f, 0.01f, 1.0f); // background color
 
-        m_Objects[0].Render(currentFrame, model, view, projection, lightPos);
+        m_Objects[0].Render(currentFrame, model, view, projection, lightPos, m_Camera.getWorldPos());
 
         glfwSwapBuffers(m_Window);
         glfwPollEvents();
+
+        //std::cout << "loop ";
+        std::cout << m_Camera.getWorldPos().x << " " << m_Camera.getWorldPos().y << " " << m_Camera.getWorldPos().z << "\n";
 
     }
 }

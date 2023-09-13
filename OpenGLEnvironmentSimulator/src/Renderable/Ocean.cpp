@@ -30,6 +30,7 @@ void printUVec3(glm::uvec3 vec) {
 Ocean::Ocean(const uint32_t gridDimensions, const float waveHeight_A, glm::vec2 windDir_w, const float length)
 	: m_GridSideDimension(gridDimensions), m_phillipsConstant_A(waveHeight_A), m_windDir_w(windDir_w), m_Length(length),
 	  m_OceanShaderProgram(ShaderProgram("./shaders/oceanVertShader.glsl", "./shaders/oceanFragShader.glsl")),
+	  // m_VBO(VertexBuffer()), m_EBO(ElementBuffer()),
 	  // FFT
 	  m_FFT(FFT(m_GridSideDimension)), 
 	  m_HTilde(std::vector<std::complex<float>>(m_GridSideDimension * m_GridSideDimension)),
@@ -126,16 +127,8 @@ void Ocean::Initialize() {
 	m_PositionAttrib = glGetAttribLocation(m_OceanShaderProgram.getID(), "inV_Pos");
 	m_NormalAttrib = glGetAttribLocation(m_OceanShaderProgram.getID(), "inV_Norm");
 
-	//std::vector<float> vertices;
-	//for (int i = 0; i < m_Vertices.size(); i++) {
-	//	vertices.push_back(m_Vertices[i].x);
-	//	vertices.push_back(m_Vertices[i].y);
-	//	vertices.push_back(m_Vertices[i].z);
-	//}
-	//std::vector<uint32_t> indices;
-	//for (int i = 0; i < m_Indices.size(); i++) {
-	//	indices.push_back(m_Indices[i]);
-	//}
+	//m_EBO.Initialize(m_Indices);
+
 
 	// generate and bind grid VBO, VAO, and EBO
 	glGenBuffers(1, &m_GridVBO);
@@ -159,28 +152,11 @@ void Ocean::Initialize() {
 
 	std::cout << "[J] - Ocean object successfully initialized! \n\n";
 	
-	/*
-	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
-	glGenVertexArrays(1, &VAO);
-
-	glBindVertexArray(VAO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices[0]) * vertices.size(), &vertices[0], GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[0]) * indices.size(), &indices[0], GL_STATIC_DRAW);
-
-	glEnableVertexAttribArray(m_PositionAttrib);
-	glVertexAttribPointer(m_PositionAttrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	*/
-	
-	
 }
 
-void Ocean::Render(const float time, glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat, glm::vec3 in_LightPos) { // render function
+void Ocean::Render(const float time, glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat, glm::vec3 in_LightPos, glm::vec3 in_CamPos) { // render function
 
+	//if (time < 0.5f) EvaluateWavesDFT(time);
 	EvaluateWavesDFT(time);
 	//EvaluateWavesFFT(time);
 
@@ -189,14 +165,11 @@ void Ocean::Render(const float time, glm::mat4 in_ModelMat, glm::mat4 in_ViewMat
 	m_OceanShaderProgram.SetMat4("u_View", in_ViewMat);
 	m_OceanShaderProgram.SetMat4("u_Projection", in_ProjeMat);
 
+	m_OceanShaderProgram.SetVec3("u_CameraWorldPos", in_CamPos);
 	m_OceanShaderProgram.SetFloat("u_AmbientStrength", 0.25f);
 	m_OceanShaderProgram.SetVec3("u_OceanColor", glm::vec3(0.0f, 0.2f, 0.2f));
 	m_OceanShaderProgram.SetVec3("u_LightColor", glm::vec3(1.0f, 1.0f, 1.0f));
 	m_OceanShaderProgram.SetVec3("u_LightPos", in_LightPos);
-	
-	//glBindVertexArray(VAO);
-	//glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_GridVBO);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(OceanVertex) * m_Vertices.size(), &m_Vertices[0]);
@@ -208,10 +181,7 @@ void Ocean::Render(const float time, glm::mat4 in_ModelMat, glm::mat4 in_ViewMat
 	glEnableVertexAttribArray(m_NormalAttrib);
 	glVertexAttribPointer(m_NormalAttrib, 3, GL_FLOAT, GL_FALSE, sizeof(OceanVertex), (GLvoid*)vertexPositionOffset);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_GridEBO);
-
-	//glBindVertexArray(0);
-	//glBindBuffer(GL_ARRAY_BUFFER, 0);
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	//m_EBO.Bind();
 
 	//glDrawArrays(GL_TRIANGLES, 0, 1 * 3);
 	glDrawElements(GL_TRIANGLES, m_Indices.size() * 3, GL_UNSIGNED_INT, 0);
@@ -220,6 +190,8 @@ void Ocean::Render(const float time, glm::mat4 in_ModelMat, glm::mat4 in_ViewMat
 
 void Ocean::DeallocateResources() {
 
+	// was breaking my whole program bruh
+	// 
 	//glDeleteVertexArrays(1, &m_GridVBO);
 	//glDeleteBuffers(1, &m_GridVAO);
 	//glDeleteBuffers(1, &m_GridEBO);

@@ -9,10 +9,12 @@ uniform mat4 u_View;
 uniform mat4 u_Projection;
 uniform vec3 u_LightPos;
 
+
 out vec3 inF_Normal;
 out vec3 inF_LightDir;
 out vec3 inF_HalfwayVector; // idk
 
+out float inF_YPosition;
 out vec3 inF_FragPos;
 
 void main() 
@@ -30,5 +32,6 @@ void main()
 	inF_HalfwayVector = inF_LightDir + normalize(-viewHelper.xyz);
 
 	inF_FragPos = vec3(u_Model * vec4(inV_Pos, 1.0f));
+	inF_YPosition = inV_Pos.y;
 
 }

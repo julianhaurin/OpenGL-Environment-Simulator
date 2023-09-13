@@ -9,6 +9,9 @@
 // update 9/6 - i think the destructor is being called??? like when its not supposed to
 // which is why m_GridVBO wont render but VBO will
 // could also use pocketfft or kissfft or fftw
+// change order of member initalization list in .cpp file
+
+// UPDATE RENDER() FUNCTION IN INTERFACE 
 
 #include "Renderable.h"
 
@@ -34,6 +37,10 @@
 
 #include "../Utility/FFT.h"
 #include "../ShaderHandlers/ShaderProgram.h"
+
+#include "../VertexBuffer.h"
+#include "../ElementBuffer.h"
+
 
 // data within ocean grid vertex
 struct OceanVertex {
@@ -61,11 +68,14 @@ public:
 	Ocean(const uint32_t gridDimensions = 8, const float waveHeight_A = 1.0f, glm::vec2 windDir_w = glm::vec2(1.0f, 1.0f), const float length = 8);
 	~Ocean();
 
-	void Render(const float time, glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat, glm::vec3 in_LightPos) override;
+	void Render(const float time, glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat, glm::vec3 in_LightPos, glm::vec3 in_CamPos) override;
 
 private:
 	// shader program
 	ShaderProgram m_OceanShaderProgram;
+
+	//VertexBuffer m_VBO;
+	//ElementBuffer m_EBO;
 
 	GLuint m_GridVBO;
 	GLuint m_GridVAO;
@@ -111,9 +121,5 @@ private:
 	// evaluates new wave height
 	void EvaluateWavesDFT(const float time); // discrete fourier transform
 	void EvaluateWavesFFT(const float time); // fast fourier transform
-
-	// test stuff
-	GLuint VBO, EBO, VAO;
-	
 
 };

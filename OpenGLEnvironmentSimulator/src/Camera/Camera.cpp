@@ -1,17 +1,17 @@
 
 #include "Camera.h"
 
-const float Camera::initSpeed = 5.0f;
+const float Camera::initSpeed = 10.0f;
 const float Camera::initMouseSensitivity = 0.1f;
 const float Camera::initZoom = 45.0f;
 
 Camera::Camera(glm::vec3 position, glm::vec3 worldUp, float yaw, float pitch)
 	: m_Position(position), m_WorldUp(worldUp),
-	m_Right(glm::vec3(1.0f, 0.0f, 0.0f)),
-	m_Up(glm::vec3(0.0f, 1.0f, 0.0f)),
-	m_Front(glm::vec3(0.0f, 0.0f, -1.0f)),
-	m_Yaw(yaw), m_Pitch(pitch),
-	m_Speed(initSpeed), m_MouseSensitivity(initMouseSensitivity), m_Zoom(initZoom)
+	  m_Right(glm::vec3(1.0f, 0.0f, 0.0f)),
+	  m_Up(glm::vec3(0.0f, 1.0f, 0.0f)),
+	  m_Front(glm::vec3(0.0f, 0.0f, -1.0f)),
+	  m_Yaw(yaw), m_Pitch(pitch),
+	  m_Speed(initSpeed), m_MouseSensitivity(initMouseSensitivity), m_Zoom(initZoom)
 {
 	updateCameraVectors();
 }
@@ -82,6 +82,10 @@ glm::mat4 Camera::CalculateViewMatrix() const {
 float Camera::getZoom() const { 
 	return m_Zoom;
 
+}
+
+glm::vec3 Camera::getWorldPos() const {
+	return m_Position;
 }
 
 // recalculates camera member variables when needed

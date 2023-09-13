@@ -6,6 +6,9 @@ in vec3 inF_LightDir;
 in vec3 inF_HalfwayVector;
 
 in vec3 inF_FragPos;
+in float inF_YPosition;
+
+uniform vec3 u_CameraWorldPos;
 
 uniform float u_AmbientStrength;
 uniform vec3 u_OceanColor;
@@ -34,17 +37,37 @@ void main()
     float dotProd = dot(unitNormal, unitLightDir);
     bool isFacing = dotProd > 0.0;
 
-    out_FragColor = 
-        emissiveColor * emissiveStrength +
-        ambientColor * ambientStrength +
-        diffuseColor * diffuseStrength * max(dotProd, 0.0f) +
-        (isFacing ? 
-            specularColor * specularStrength * max(pow(dot(unitNormal, unitHalfwayVector), 120.0f), 0.0f) : 
-            vec4(0.0f, 0.0f, 0.0f, 0.0f));
+    // out_FragColor = 
+    //    emissiveColor * emissiveStrength +
+    //    ambientColor * ambientStrength +
+    //    diffuseColor * diffuseStrength * max(dotProd, 0.0f) +
+    //    (isFacing ? 
+    //        specularColor * specularStrength * max(pow(dot(unitNormal, unitHalfwayVector), 120.0f), 0.0f) : 
+    //        vec4(0.0f, 0.0f, 0.0f, 0.0f));
 
-    out_FragColor.a = 1.0f;
+    vec3 viewDir = normalize(u_CameraWorldPos - inF_FragPos);
+    float fresnelEffect = 0.05f + 0.95f * pow(1.0f - dot(unitNormal, viewDir), 1000.0f);
 
-    out_FragColor = vec4(u_OceanColor, 1.0f);
+    vec3 skyColor = vec3(3.2f, 9.6f, 8.8f);
+    vec3 oceanColor = vec3(0.004f, 0.016f, 0.047f);
+
+    vec3 sky = fresnelEffect * skyColor;
+    float diffuse = clamp(dot(unitNormal, normalize(-unitLightDir)), 0.0f, 1.0f);
+    vec3 water = (1.f - fresnelEffect) * oceanColor * skyColor * diffuse;
+    
+    vec3 color = sky + water;
+    if (inF_YPosition <= 0) {
+        color.z += color.z * abs(inF_YPosition) * 100.0f;
+    }
+
+    out_FragColor = vec4(color, 1.0f);
+
+    float colorModifer = 10 * inF_YPosition + 75.0f;
+    out_FragColor = vec4(0.1f, colorModifer / 100.0f, 0.9f - colorModifer / 900.0f, 1.0f);
+    out_FragColor *= vec4(1.0f, 0.8f, 1.1f, 1.0f);
+
+    sky *= out_FragColor.z;
+    // out_FragColor *= vec4(sky, 1.0f);
 
 }
 

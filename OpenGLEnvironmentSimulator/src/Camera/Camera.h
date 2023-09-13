@@ -38,6 +38,7 @@ public:
 
 	glm::mat4 CalculateViewMatrix() const;
 	float getZoom() const;
+	glm::vec3 getWorldPos() const;
 
 private:
 

@@ -5,6 +5,8 @@
 // lots of printing good for debugging - remove in release version
 // add override keyword bum
 // 
+// research better error handling practices?
+// 
 
 #include "Renderer.h"
 
