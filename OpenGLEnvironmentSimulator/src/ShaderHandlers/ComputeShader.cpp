@@ -5,19 +5,29 @@ ComputeShader::ComputeShader(const char* in_compShaderPath)
 	: m_compShaderCode("")
 {
 	retrieveShaderSourceCode(in_compShaderPath);
+	InitializeShaders();
 }
 
 // compiles compute shader and checks for errors
 void ComputeShader::InitializeShaders() {
 	const char* compShaderCode = m_compShaderCode.c_str();
 
-	m_ID = glCreateShader(GL_COMPUTE_SHADER);
-	glShaderSource(m_ID, 1, &compShaderCode, NULL);
-	glCompileShader(m_ID);
+	GLuint computeID = glCreateShader(GL_COMPUTE_SHADER);
+	glShaderSource(computeID, 1, &compShaderCode, NULL);
+	glCompileShader(computeID);
 
 	if (checkCompilationSuccess(m_ID, "compute") == true) {
 		std::cout << "[J] Shader program (ID: " << m_ID << ") successfully compiled compute shader! \n";
 	}
+
+	m_ID = glCreateProgram();
+	glAttachShader(m_ID, computeID);
+	glLinkProgram(m_ID);
+
+	// *** Todo: check linking success
+
+	std::cout << std::endl;
+	
 
 }
 

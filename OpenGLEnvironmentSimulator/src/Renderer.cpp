@@ -19,7 +19,7 @@ Renderer::Renderer()
     }
     std::cout << "[J] - Renderer successfully initialized! \n\n";
 
-    Ocean m_Ocean = Ocean(32, 0.0025f, glm::vec2(32.0f, 16.0f), 32);
+    Ocean m_Ocean = Ocean(16, 0.0035f, glm::vec2(32.0f, 24.0f), 32);
     m_Objects.push_back(m_Ocean);
 
 }
@@ -62,7 +62,7 @@ void Renderer::Run() {
         glfwPollEvents();
 
         //std::cout << "loop ";
-        std::cout << m_Camera.getWorldPos().x << " " << m_Camera.getWorldPos().y << " " << m_Camera.getWorldPos().z << "\n";
+        //std::cout << m_Camera.getWorldPos().x << " " << m_Camera.getWorldPos().y << " " << m_Camera.getWorldPos().z << "\n";
 
     }
 }

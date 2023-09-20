@@ -37,6 +37,7 @@
 
 #include "../Utility/FFT.h"
 #include "../ShaderHandlers/ShaderProgram.h"
+#include "../ShaderHandlers/ComputeShader.h"
 
 #include "../VertexBuffer.h"
 #include "../ElementBuffer.h"
@@ -73,6 +74,7 @@ public:
 private:
 	// shader program
 	ShaderProgram m_OceanShaderProgram;
+	ComputeShader m_OceanComputeShader;
 
 	//VertexBuffer m_VBO;
 	//ElementBuffer m_EBO;

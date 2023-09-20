@@ -1,6 +1,7 @@
 
 // Notes:
 // add common file-reading capability (right now they are split into separate functions within child classes)
+// checkCompilationSuccess return type is weird ... check, lots of changes 
 
 #pragma once
 
@@ -17,7 +18,6 @@
 class Shader
 {
 public:
-	virtual void InitializeShaders() = 0; // initialize shader objects
 	void UseProgram() const;
 
 	// uniform setting functions //
@@ -28,8 +28,9 @@ public:
 	void SetMat4(const std::string& name, const glm::mat4& mat) const;
 
 protected:
-	unsigned int m_ID;
+	GLuint m_ID;
 
+	virtual void InitializeShaders() = 0; // initialize shader objects
 	bool checkCompilationSuccess(const uint32_t in_shaderID, const std::string in_type) const;
 
 };

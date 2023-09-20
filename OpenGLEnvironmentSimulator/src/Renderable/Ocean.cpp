@@ -12,6 +12,7 @@
 
 // add more comments
 // change pi
+// check order of member initialization lists (others as well)
 
 
 #include "Ocean.h"
@@ -30,6 +31,7 @@ void printUVec3(glm::uvec3 vec) {
 Ocean::Ocean(const uint32_t gridDimensions, const float waveHeight_A, glm::vec2 windDir_w, const float length)
 	: m_GridSideDimension(gridDimensions), m_phillipsConstant_A(waveHeight_A), m_windDir_w(windDir_w), m_Length(length),
 	  m_OceanShaderProgram(ShaderProgram("./shaders/oceanVertShader.glsl", "./shaders/oceanFragShader.glsl")),
+	  m_OceanComputeShader(ComputeShader("./shaders/oceanCompShader.glsl")),
 	  // m_VBO(VertexBuffer()), m_EBO(ElementBuffer()),
 	  // FFT
 	  m_FFT(FFT(m_GridSideDimension)), 
@@ -123,12 +125,17 @@ void Ocean::Initialize() {
 		}
 	}
 
+	// Initialize vertex and fragment shader program
 	m_OceanShaderProgram.UseProgram();
 	m_PositionAttrib = glGetAttribLocation(m_OceanShaderProgram.getID(), "inV_Pos");
 	m_NormalAttrib = glGetAttribLocation(m_OceanShaderProgram.getID(), "inV_Norm");
 
-	//m_EBO.Initialize(m_Indices);
+	// Initialize compute shader program
+	m_OceanComputeShader.UseProgram();
+	glDispatchCompute(m_GridSideDimension + 1, m_GridSideDimension + 1, 1); // *** CHECK ACCURACY
+	glMemoryBarrier(GL_ALL_BARRIER_BITS); // makes sure data is computed before vertex shader is rendered (i think)
 
+	//m_EBO.Initialize(m_Indices);
 
 	// generate and bind grid VBO, VAO, and EBO
 	glGenBuffers(1, &m_GridVBO);

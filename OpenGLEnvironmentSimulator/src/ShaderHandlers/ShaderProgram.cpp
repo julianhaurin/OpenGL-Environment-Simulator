@@ -1,4 +1,7 @@
 
+// Notes:
+// check link status too
+
 #include "ShaderProgram.h"
 
 // initializes vertex and fragment data source code (tesselation shader coming soon?)
@@ -19,8 +22,8 @@ void ShaderProgram::InitializeShaders() {
 	const char* vertShaderCode = m_vertShaderCode.c_str();
 	const char* fragShaderCode = m_fragShaderCode.c_str();
 
-	uint32_t vertShaderID;
-	uint32_t fragShaderID;
+	GLuint vertShaderID;
+	GLuint fragShaderID;
 
 	// compiles vertex shader
 	vertShaderID = glCreateShader(GL_VERTEX_SHADER);
