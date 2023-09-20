@@ -83,6 +83,8 @@ private:
 	GLuint m_GridVAO;
 	GLuint m_GridEBO;
 
+	GLuint m_GridSSBO;
+
 	// shader attribute locations
 	GLint m_PositionAttrib;
 	GLint m_NormalAttrib;

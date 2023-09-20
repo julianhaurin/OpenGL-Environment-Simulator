@@ -10,6 +10,7 @@ ShaderProgram::ShaderProgram(const char* in_vertexShaderPath, const char* in_fra
 {
 	retrieveShaderSourceCode(in_vertexShaderPath, in_fragmentShaderPath);
 	InitializeShaders();
+
 }
 
 GLint ShaderProgram::getID() {

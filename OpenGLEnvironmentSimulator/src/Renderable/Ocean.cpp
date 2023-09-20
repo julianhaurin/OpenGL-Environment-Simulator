@@ -13,6 +13,7 @@
 // add more comments
 // change pi
 // check order of member initialization lists (others as well)
+// init vbo, ebo, etc. to 0 in consturctor init list?
 
 
 #include "Ocean.h"
@@ -26,6 +27,8 @@ void printVec3(glm::vec3 vec) {
 void printUVec3(glm::uvec3 vec) {
 	std::cout << vec.x << ", " << vec.y << ", " << vec.z << ", \n";
 }
+
+
 
 // initializes vertices and indices vectors and creates ocean shader program
 Ocean::Ocean(const uint32_t gridDimensions, const float waveHeight_A, glm::vec2 windDir_w, const float length)
@@ -45,7 +48,7 @@ Ocean::Ocean(const uint32_t gridDimensions, const float waveHeight_A, glm::vec2 
 	  m_PFFT_stride(sizeof(float))
 {
 	assert(m_GridSideDimension && !(m_GridSideDimension & (m_GridSideDimension - 1))); // m_GridSideDimension == power of 2
-
+	
 	//std::cout << "Ocean Constructor \n";
 
 	const uint32_t sidePlus1 = m_GridSideDimension + 1;  // one greater than grid dimension for tiling purposes
@@ -125,6 +128,8 @@ void Ocean::Initialize() {
 		}
 	}
 
+	
+
 	// Initialize vertex and fragment shader program
 	m_OceanShaderProgram.UseProgram();
 	m_PositionAttrib = glGetAttribLocation(m_OceanShaderProgram.getID(), "inV_Pos");
@@ -132,10 +137,12 @@ void Ocean::Initialize() {
 
 	// Initialize compute shader program
 	m_OceanComputeShader.UseProgram();
-	glDispatchCompute(m_GridSideDimension + 1, m_GridSideDimension + 1, 1); // *** CHECK ACCURACY
+	glDispatchCompute(m_GridSideDimension + 1, m_GridSideDimension + 1, 1); // num of workgroups *** CHECK ACCURACY
 	glMemoryBarrier(GL_ALL_BARRIER_BITS); // makes sure data is computed before vertex shader is rendered (i think)
 
 	//m_EBO.Initialize(m_Indices);
+
+	
 
 	// generate and bind grid VBO, VAO, and EBO
 	glGenBuffers(1, &m_GridVBO);
@@ -157,16 +164,25 @@ void Ocean::Initialize() {
 	glEnableVertexAttribArray(m_NormalAttrib);
 	glVertexAttribPointer(m_NormalAttrib, 3, GL_FLOAT, GL_FALSE, sizeof(OceanVertex), (GLvoid*)vertexPositionOffset);
 
+	// generate and bind grid SSBO for compute shader
+	glGenBuffers(1, &m_GridSSBO);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_GridSSBO);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_Vertices[0]) * m_Vertices.size(), &m_Vertices[0], GL_DYNAMIC_DRAW);
+
 	std::cout << "[J] - Ocean object successfully initialized! \n\n";
+
+	
 	
 }
 
 void Ocean::Render(const float time, glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat, glm::vec3 in_LightPos, glm::vec3 in_CamPos) { // render function
 
+
 	//if (time < 0.5f) EvaluateWavesDFT(time);
 	EvaluateWavesDFT(time);
 	//EvaluateWavesFFT(time);
 
+	// update uniforms //
 	m_OceanShaderProgram.UseProgram();
 	m_OceanShaderProgram.SetMat4("u_Model", in_ModelMat);
 	m_OceanShaderProgram.SetMat4("u_View", in_ViewMat);
@@ -177,6 +193,24 @@ void Ocean::Render(const float time, glm::mat4 in_ModelMat, glm::mat4 in_ViewMat
 	m_OceanShaderProgram.SetVec3("u_OceanColor", glm::vec3(0.0f, 0.2f, 0.2f));
 	m_OceanShaderProgram.SetVec3("u_LightColor", glm::vec3(1.0f, 1.0f, 1.0f));
 	m_OceanShaderProgram.SetVec3("u_LightPos", in_LightPos);
+
+	// update grid SSBO //
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_GridSSBO);
+	// ssbo pointer is null ? so memcpy breaks
+	//struct OceanVertex* ssboPointer = 
+		// (struct OceanVertex*) glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY); // retrieve pointer to data in GPU memory
+
+	//std::cout << "Size of vertex data: " << sizeof(m_Vertices[0]) * m_Vertices.size() << "\n";
+	 struct OceanVertex* ssboPointer = 
+		 (struct OceanVertex*) glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, sizeof(m_Vertices[0]) * m_Vertices.size(), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+
+	// breaks if > 0
+	//for (int i = 0; i < m_GridSideDimension + 1; i++) {
+	//	for (int j = 0; j < m_GridSideDimension + 1; j++) {
+	//		ssboPointer[i][j].x = 1.0f;
+	//	}
+	//}
+	// std::memcpy(ssboPointer, &m_Vertices[0], 1); // sizeof(m_Vertices[0])* m_Vertices.size()); // *** use std::copy instead
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_GridVBO);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(OceanVertex) * m_Vertices.size(), &m_Vertices[0]);

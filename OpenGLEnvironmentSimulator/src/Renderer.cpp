@@ -19,7 +19,8 @@ Renderer::Renderer()
     }
     std::cout << "[J] - Renderer successfully initialized! \n\n";
 
-    Ocean m_Ocean = Ocean(16, 0.0035f, glm::vec2(32.0f, 24.0f), 32);
+    Ocean m_Ocean = Ocean(16, 0.005f, glm::vec2(32.0f, 24.0f), 32);
+
     m_Objects.push_back(m_Ocean);
 
 }

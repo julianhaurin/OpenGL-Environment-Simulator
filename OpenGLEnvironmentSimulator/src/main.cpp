@@ -6,6 +6,8 @@
 // add override keyword bum
 // 
 // research better error handling practices?
+// get printOpenGLErrors() to util file and use elsewhere
+// in compute shader class rn
 // 
 
 #include "Renderer.h"

@@ -1,11 +1,23 @@
 
 #include "ComputeShader.h"
 
+void printOpenGLErrors() {
+	GLenum currentError = glGetError();
+	while (currentError != GL_NO_ERROR) {
+		std::cout << "[J] ERROR - OPENGL: OpenGL error detected: " << currentError << std::endl;
+		currentError = glGetError();
+	}
+
+}
+
 ComputeShader::ComputeShader(const char* in_compShaderPath) 
 	: m_compShaderCode("")
 {
+	
 	retrieveShaderSourceCode(in_compShaderPath);
 	InitializeShaders();
+	
+
 }
 
 // compiles compute shader and checks for errors
@@ -16,10 +28,13 @@ void ComputeShader::InitializeShaders() {
 	glShaderSource(computeID, 1, &compShaderCode, NULL);
 	glCompileShader(computeID);
 
-	if (checkCompilationSuccess(m_ID, "compute") == true) {
+	if (checkCompilationSuccess(computeID, "compute") == true) {
 		std::cout << "[J] Shader program (ID: " << m_ID << ") successfully compiled compute shader! \n";
 	}
 
+	//GLint success;
+	//glGetShaderiv(m_ID, GL_COMPILE_STATUS, &success);
+	
 	m_ID = glCreateProgram();
 	glAttachShader(m_ID, computeID);
 	glLinkProgram(m_ID);
