@@ -33,7 +33,7 @@ public:
 	~Model();
 
 	void Bind();
-	void Render(glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat);
+	void Render(glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat, glm::vec3 in_ViewPos);
 
 
 private:

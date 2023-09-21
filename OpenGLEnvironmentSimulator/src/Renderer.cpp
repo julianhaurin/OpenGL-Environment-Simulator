@@ -20,7 +20,7 @@ Renderer::Renderer()
     std::cout << "[J] - Renderer successfully initialized! \n\n";
 
     m_Ocean = new Ocean(16, 0.005f, glm::vec2(32.0f, 24.0f), 32);
-    m_TestModel = new Model("./assets/vikingRoom.obj", 10u);
+    m_TestModel = new Model("./assets/cube.obj", 1u);
 
 }
 
@@ -61,7 +61,7 @@ void Renderer::Run() {
         //m_Ocean->Render(currentFrame, model, view, projection, lightPos, m_Camera.getWorldPos());
         //m_Objects[0].Render(currentFrame, model, view, projection, lightPos, m_Camera.getWorldPos());
 
-        m_TestModel->Render(model, view, projection);
+        m_TestModel->Render(model, view, projection, m_Camera.getWorldPos());
 
         glfwSwapBuffers(m_Window);
         glfwPollEvents();

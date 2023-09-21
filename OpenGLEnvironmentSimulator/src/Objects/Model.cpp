@@ -28,7 +28,7 @@ void Model::Bind() {
 
 }
 
-void Model::Render(glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat) {
+void Model::Render(glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat, glm::vec3 in_ViewPos) {
 
 	m_ShaderProgram.UseProgram();
 	m_ShaderProgram.SetMat4("u_Model", in_ModelMat);
@@ -36,8 +36,10 @@ void Model::Render(glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_Pro
 	m_ShaderProgram.SetMat4("u_Projection", in_ProjeMat);
 
 	// lighting
-	m_ShaderProgram.SetVec3("u_ObjectColor", glm::vec3(1.0f, 0.1f, 0.1f));
+	m_ShaderProgram.SetVec3("u_ObjectColor", glm::vec3(0.9f, 0.1f, 0.1f));
 	m_ShaderProgram.SetVec3("u_LightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+	m_ShaderProgram.SetVec3("u_LightPosition", glm::vec3(200.0f, 200.0f, 300.0f));
+	m_ShaderProgram.SetVec3("u_ViewPosition", in_ViewPos);
 
 	Bind();
 	glDrawArrays(GL_TRIANGLES, 0, m_VertexData.size() / 3);
@@ -107,9 +109,9 @@ bool Model::loadObjData() {
 	
 				// normal data
 				if (index.normal_index >= 0) {
-					//m_VertexData.push_back(attrib.normals[3 * size_t(index.normal_index)]); // + 0
-					//m_VertexData.push_back(attrib.normals[3 * size_t(index.normal_index) + 1]);
-					//m_VertexData.push_back(attrib.normals[3 * size_t(index.normal_index) + 2]);
+					m_VertexData.push_back(attrib.normals[3 * size_t(index.normal_index)]); // + 0
+					m_VertexData.push_back(attrib.normals[3 * size_t(index.normal_index) + 1]);
+					m_VertexData.push_back(attrib.normals[3 * size_t(index.normal_index) + 2]);
 				}
 
 			}
@@ -149,9 +151,9 @@ void Model::setUpModel() {
 
 	// VAO set up
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(m_VertexData[0]) * 3, (GLvoid*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(m_VertexData[0]) * 6, (GLvoid*)0);
 
-	//glEnableVertexAttribArray(1);
-	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(m_VertexData[0]) * 6, (GLvoid*)(3 * sizeof(m_VertexData[0])));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(m_VertexData[0]) * 6, (GLvoid*)(3 * sizeof(m_VertexData[0])));
 
 }

@@ -8,7 +8,7 @@
 // research better error handling practices?
 // get printOpenGLErrors() to util file and use elsewhere
 // in compute shader class rn
-// fix order of member init lists EVERYWHERE
+// fix order of member init lists EVERYWHERE, make everything const
 // had to use pointer for ocean class in renderer - change?
 // std::cerr instead of std::cout?
 // commented out a bunch of code in render function of ocean class - still works but idk lol
