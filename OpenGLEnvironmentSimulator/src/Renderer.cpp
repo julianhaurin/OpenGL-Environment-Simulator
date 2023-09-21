@@ -20,7 +20,8 @@ Renderer::Renderer()
     std::cout << "[J] - Renderer successfully initialized! \n\n";
 
     m_Ocean = new Ocean(16, 0.005f, glm::vec2(32.0f, 24.0f), 32);
-    m_TestModel = new Model("./assets/cube.obj", 1u);
+    m_TestModel = new Model("./assets/cube.obj", getMaterialEmerald(), 1u);
+    //m_TestLightSource = new Model("./assets/cube.obj", 1u);
 
 }
 
@@ -28,6 +29,7 @@ Renderer::~Renderer()
 {
     delete m_Ocean;
     delete m_TestModel;
+    delete m_TestLightSource;
     glfwCleanUp(m_Window);
 }
 

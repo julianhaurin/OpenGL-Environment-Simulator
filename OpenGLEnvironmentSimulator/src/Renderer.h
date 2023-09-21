@@ -24,6 +24,7 @@
 #include "Camera/Camera.h"
 #include "Ocean/Ocean.h"
 #include "Objects/Model.h"
+#include "Objects/Material.h"
 #include "Utility/utility.h"
 
 // represents an OpenGL context and scene
@@ -49,6 +50,7 @@ private:
 
 	// test model object
 	Model* m_TestModel;
+	Model* m_TestLightSource;
 
     float m_lastY;
     float m_lastX;

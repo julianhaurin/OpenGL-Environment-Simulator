@@ -5,10 +5,11 @@
 
 // Public Methods //
 
-Model::Model(const std::string in_objFile, const uint32_t in_sizeMultiplyer)
+Model::Model(const std::string in_objFile, const Material in_material, const uint32_t in_sizeMultiplyer)
 	: m_objFilePath(in_objFile), 
 	  m_ShaderProgram(ShaderProgram("./shaders/vertexShader.vs", "./shaders/fragmentShader.fs")),
-	  m_VBO(0), m_EBO(0), m_VAO(0), m_vertexPositionMultiplyer(in_sizeMultiplyer)
+	  m_VBO(0), m_EBO(0), m_VAO(0), m_vertexPositionMultiplyer(in_sizeMultiplyer),
+	  m_Material(in_material)
 {
 	assert(in_sizeMultiplyer >= 1);
 
@@ -36,10 +37,16 @@ void Model::Render(glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_Pro
 	m_ShaderProgram.SetMat4("u_Projection", in_ProjeMat);
 
 	// lighting
-	m_ShaderProgram.SetVec3("u_ObjectColor", glm::vec3(0.9f, 0.1f, 0.1f));
+	m_ShaderProgram.SetVec3("u_ObjectColor", glm::vec3(0.1f, 0.9f, 0.2f));
 	m_ShaderProgram.SetVec3("u_LightColor", glm::vec3(1.0f, 1.0f, 1.0f));
 	m_ShaderProgram.SetVec3("u_LightPosition", glm::vec3(200.0f, 200.0f, 300.0f));
 	m_ShaderProgram.SetVec3("u_ViewPosition", in_ViewPos);
+
+	// material 
+	m_ShaderProgram.SetVec3("u_Material.ambient", m_Material.ambient);
+	m_ShaderProgram.SetVec3("u_Material.diffuse", m_Material.diffuse);
+	m_ShaderProgram.SetVec3("u_Material.specular", m_Material.specular);
+	m_ShaderProgram.SetFloat("u_Material.ambient", m_Material.shininess);
 
 	Bind();
 	glDrawArrays(GL_TRIANGLES, 0, m_VertexData.size() / 3);

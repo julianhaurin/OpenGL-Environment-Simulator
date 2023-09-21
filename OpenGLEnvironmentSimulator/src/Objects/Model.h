@@ -3,6 +3,7 @@
 
 // Notes:
 // obj material config path hardcoded to ./assets/textures/ remember this being a bug before but idk if its always necessary
+// allow making models smaller
 
 #pragma once
 
@@ -16,6 +17,7 @@
 #include <tinyobj/tiny_obj_loader.h>	
 
 #include "../ShaderHandlers/ShaderProgram.h"
+#include "Material.h"
 
 // represents data of one vertex
 //struct VertexData {
@@ -29,7 +31,7 @@ class Model
 public:
 
 	// in_sizeMultiplyer controls size of object (makes it bigger)
-	Model(const std::string in_objFile, const uint32_t in_sizeMultiplyer = 1);
+	Model(const std::string in_objFile, const Material in_material, const uint32_t in_sizeMultiplyer = 1);
 	~Model();
 
 	void Bind();
@@ -49,6 +51,7 @@ private:
 	std::vector<tinyobj::real_t> m_VertexData; // EBO data
 	std::vector<tinyobj::index_t> m_IndexData; // EBO data
 
+	const Material m_Material;
 	const uint32_t m_vertexPositionMultiplyer;
 
 	bool loadObjData();
