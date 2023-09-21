@@ -11,4 +11,7 @@
 void glfwErrorCallback(int code, const char* description);
 void glfwFramebufferSizeCallback(GLFWwindow* window, int width, int height);
 
+// prints all current OpenGL errors
+void printOpenGLErrors();
+
 

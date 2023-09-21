@@ -14,4 +14,14 @@ void glfwFramebufferSizeCallback(GLFWwindow* window, int width, int height) {
 
 }
 
+// prints all current OpenGL errors
+void printOpenGLErrors() {
+	GLenum currentError = glGetError();
+	while (currentError != GL_NO_ERROR) {
+		std::cout << "[J] ERROR - OPENGL: OpenGL error detected: " << currentError << std::endl;
+		currentError = glGetError();
+	}
+
+}
+
 

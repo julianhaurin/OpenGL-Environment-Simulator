@@ -1,8 +1,8 @@
 
 #include "Camera.h"
 
-const float Camera::initSpeed = 10.0f;
-const float Camera::initMouseSensitivity = 0.1f;
+const float Camera::initSpeed = 0.1f;
+const float Camera::initMouseSensitivity = 0.01f;
 const float Camera::initZoom = 45.0f;
 
 Camera::Camera(glm::vec3 position, glm::vec3 worldUp, float yaw, float pitch)
@@ -34,13 +34,13 @@ void Camera::ProcessKeyboardInput(const CameraMovement in_Direction, const float
 		m_Position -= m_Up * velocity;
 
 	if (in_Direction == YawLeft)
-		m_Yaw -= velocity * 10.0f;
+		m_Yaw -= velocity;
 	else if (in_Direction == YawRight)
-		m_Yaw += velocity * 10.0f;
+		m_Yaw += velocity;
 	else if (in_Direction == PitchUp)
-		m_Pitch += velocity * 10.0f;
+		m_Pitch += velocity;
 	else if (in_Direction == PitchDown)
-		m_Pitch -= velocity * 10.0f;
+		m_Pitch -= velocity;
 
 	// constrains camera pitch angle
 	if (m_Pitch > 89.9f)

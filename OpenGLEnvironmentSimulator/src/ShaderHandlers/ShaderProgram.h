@@ -13,6 +13,8 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
+#include "../Utility/utility.h"
+
 // represents a shader program OpenGL object
 class ShaderProgram : public Shader
 {

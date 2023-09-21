@@ -20,6 +20,9 @@ GLint ShaderProgram::getID() {
 // compiles and links vertex and fragment shaders into shader program object and checks for errors
 void ShaderProgram::InitializeShaders() {
 
+	printOpenGLErrors();
+	//std::cout << gluErrorString(1282) << std::endl; // linking error?
+
 	const char* vertShaderCode = m_vertShaderCode.c_str();
 	const char* fragShaderCode = m_fragShaderCode.c_str();
 

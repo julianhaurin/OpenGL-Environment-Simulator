@@ -19,14 +19,15 @@ Renderer::Renderer()
     }
     std::cout << "[J] - Renderer successfully initialized! \n\n";
 
-    Ocean m_Ocean = Ocean(16, 0.005f, glm::vec2(32.0f, 24.0f), 32);
-
-    m_Objects.push_back(m_Ocean);
+    m_Ocean = new Ocean(16, 0.005f, glm::vec2(32.0f, 24.0f), 32);
+    m_TestModel = new Model("./assets/vikingRoom.obj", 10u);
 
 }
 
 Renderer::~Renderer()
 {
+    delete m_Ocean;
+    delete m_TestModel;
     glfwCleanUp(m_Window);
 }
 
@@ -57,7 +58,10 @@ void Renderer::Run() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(0.01f, 0.01f, 0.01f, 1.0f); // background color
 
-        m_Objects[0].Render(currentFrame, model, view, projection, lightPos, m_Camera.getWorldPos());
+        //m_Ocean->Render(currentFrame, model, view, projection, lightPos, m_Camera.getWorldPos());
+        //m_Objects[0].Render(currentFrame, model, view, projection, lightPos, m_Camera.getWorldPos());
+
+        m_TestModel->Render(model, view, projection);
 
         glfwSwapBuffers(m_Window);
         glfwPollEvents();

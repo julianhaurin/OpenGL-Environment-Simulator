@@ -1,15 +1,6 @@
 
 #include "ComputeShader.h"
 
-void printOpenGLErrors() {
-	GLenum currentError = glGetError();
-	while (currentError != GL_NO_ERROR) {
-		std::cout << "[J] ERROR - OPENGL: OpenGL error detected: " << currentError << std::endl;
-		currentError = glGetError();
-	}
-
-}
-
 ComputeShader::ComputeShader(const char* in_compShaderPath) 
 	: m_compShaderCode("")
 {

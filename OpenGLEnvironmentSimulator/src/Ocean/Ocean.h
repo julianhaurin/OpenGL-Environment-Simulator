@@ -13,8 +13,6 @@
 
 // UPDATE RENDER() FUNCTION IN INTERFACE 
 
-#include "Renderable.h"
-
 #include <iostream>
 #include <vector>
 #include <cstdint>
@@ -61,20 +59,23 @@ struct heightDisplacementNormal {
 
 };
 
-class Ocean : public Renderable
+class Ocean
 {
 public:
 	const static float gravityConst; // 9.81f
 
-	Ocean(const uint32_t gridDimensions = 8, const float waveHeight_A = 1.0f, glm::vec2 windDir_w = glm::vec2(1.0f, 1.0f), const float length = 8);
+	Ocean(const uint32_t gridDimensions, const float waveHeight_A = 1.0f, glm::vec2 windDir_w = glm::vec2(1.0f, 1.0f), const float length = 8);
 	~Ocean();
 
-	void Render(const float time, glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat, glm::vec3 in_LightPos, glm::vec3 in_CamPos) override;
+	void Render(const float time, glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat, glm::vec3 in_LightPos, glm::vec3 in_CamPos);
 
 private:
+
+	//Ocean();
+
 	// shader program
 	ShaderProgram m_OceanShaderProgram;
-	ComputeShader m_OceanComputeShader;
+	//ComputeShader m_OceanComputeShader;
 
 	//VertexBuffer m_VBO;
 	//ElementBuffer m_EBO;

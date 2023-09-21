@@ -8,7 +8,8 @@
 // fix error handling in inititalize function ***
 //
 // glfw callback function workaround stackoverflow.com/questions/7676971/pointing-to-a-function-that-is-a-class-member-glfw-setkeycallback
-//
+// init vbos n shit to 0
+// add fps tracker
 
 #include <iostream>
 #include <cstdint>
@@ -21,7 +22,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "Camera/Camera.h"
-#include "Renderable/Ocean.h"
+#include "Ocean/Ocean.h"
+#include "Objects/Model.h"
 #include "Utility/utility.h"
 
 // represents an OpenGL context and scene
@@ -41,7 +43,12 @@ public:
 private:
     GLFWwindow* m_Window;
 	Camera m_Camera;
-	std::vector<Ocean> m_Objects;
+
+	// Ocean object
+	Ocean* m_Ocean;
+
+	// test model object
+	Model* m_TestModel;
 
     float m_lastY;
     float m_lastX;

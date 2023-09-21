@@ -20,6 +20,9 @@ class Shader
 public:
 	void UseProgram() const;
 
+	// getters
+	inline GLuint getProgramID() { return m_ID; }
+
 	// uniform setting functions //
 	void SetBool(const std::string& name, const bool value) const;
 	void SetInt(const std::string& name, const int32_t value) const;
