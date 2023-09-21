@@ -12,6 +12,7 @@
 // had to use pointer for ocean class in renderer - change?
 // std::cerr instead of std::cout?
 // commented out a bunch of code in render function of ocean class - still works but idk lol
+// print out version to make sure its the right one (4.3 for rn)
 
 #include "Renderer.h"
 

@@ -35,6 +35,10 @@ void Model::Render(glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_Pro
 	m_ShaderProgram.SetMat4("u_View", in_ViewMat);
 	m_ShaderProgram.SetMat4("u_Projection", in_ProjeMat);
 
+	// lighting
+	m_ShaderProgram.SetVec3("u_ObjectColor", glm::vec3(1.0f, 0.1f, 0.1f));
+	m_ShaderProgram.SetVec3("u_LightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+
 	Bind();
 	glDrawArrays(GL_TRIANGLES, 0, m_VertexData.size() / 3);
 	//glDrawElements(GL_TRIANGLES, m_IndexData.size() * 3, GL_UNSIGNED_INT, 0);
