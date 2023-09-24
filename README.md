@@ -8,6 +8,8 @@ C++ OpenGL renderer that supports lighting, texturing, fully functional and user
 
 Following Jerry Tessendorf's 2004 paper on non-interactive water wave simulations, the Ocean class (Ocean.h, Ocean.cpp) simulates ocean wind waves using the Phillip's spectrum and the discrete fourier transform. 
 
+Trello link: https://trello.com/invite/openglenvironmentsimulator/ATTI683efdd362dddde516f940eb1855ab752AFA5431
+
 ### Resources
 
 Learn OpenGL tutorial by Joey de Vries: https://learnopengl.com/
