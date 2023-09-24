@@ -18,6 +18,10 @@
 
 #include "../ShaderHandlers/ShaderProgram.h"
 #include "Material.h"
+#include "Light.h"
+#include "../Utility/utility.h"
+
+//#include "../Utility/Models/CubeModel.h"
 
 // represents data of one vertex
 //struct VertexData {
@@ -53,6 +57,11 @@ private:
 
 	const Material m_Material;
 	const uint32_t m_vertexPositionMultiplyer;
+
+	Light m_Light;
+
+	std::vector<float> m_cubeVertices;
+	uint32_t m_diffuseMap;
 
 	bool loadObjData();
 	void setUpModel();

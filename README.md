@@ -1,33 +1,21 @@
-OpenGL Environment Simulator - 8/17/2023
+# OpenGL Renderer and Environment Simulator
 
-WATER SIMULATION RESOURCES:
+C++ OpenGL renderer that supports lighting, texturing, fully functional and user-controlled camera, model loading, and water wave simulations (more to come!). 
 
-3B1B, Fourier Transform, 2018: https://www.youtube.com/watch?v=spUNpyF58BY&ab_channel=3Blue1Brown
-Reducible, FFT, 2021: https://www.youtube.com/watch?v=h7apO7q16V0&ab_channel=Reducible
+## Water Wave Simulation:
+
+### Overview
+
+Following Jerry Tessendorf's 2004 paper on non-interactive water wave simulations, the Ocean class (Ocean.h, Ocean.cpp) simulates ocean wind waves using the Phillip's spectrum and the discrete fourier transform. 
+
+### Resources
+
+Learn OpenGL tutorial by Joey de Vries: https://learnopengl.com/
 
 Jerry Tessendorf, Simulating Ocean Water, 2004: https://people.computing.clemson.edu/~jtessen/reports/papers_files/coursenotes2004.pdf
 Jerry Tessdendorf, Interavtive Water Surfaces, 2004: https://people.computing.clemson.edu/~jtessen/reports/papers_files/Interactive_Water_Surfaces.pdf
 
-Matthias Muller, Resources: https://matthias-research.github.io/pages/publications/publications.html, https://ubm-twvideo01.s3.amazonaws.com/o1/vault/gdc08/slides/S6509i1.pdf 
-Bernhard Fleck, Real-Time Rendering of Water in CG: https://scholarworks.calstate.edu/downloads/m900nt80d
-
 Keith Lantz, Ocean Simulation, 2011: https://www.keithlantz.net/2011/10/ocean-simulation-part-one-using-the-discrete-fourier-transform/
-Scott Lembcke, Water Wave Simulation, 2023: https://slembcke.github.io/WaterWaves
 
-Ravindra, Simulation of Water Using OpenGL, 2018: https://scholarworks.calstate.edu/downloads/m900nt80d
-
-Github Repos:
-https://github.com/gasgiant/FFT-Ocean
-https://github.com/iamyoukou/fftWater/tree/master
-https://github.com/gasgiant/FFT-Ocean
-https://github.com/fynnfluegge/oreon-engine
-https://github.com/achalpandeyy/OceanFFT
-https://github.com/raaavioli/WaterRendering
-
-Great Water: 
-https://www.jpgrenier.org/ocean.html
-
-Other:
-fft water lecture: https://www.youtube.com/watch?v=ClW3fo94KR4&ab_channel=Codemotion
-https://arm-software.github.io/opengl-es-sdk-for-android/ocean_f_f_t.html
+FFT water lecture: https://www.youtube.com/watch?v=ClW3fo94KR4&ab_channel=Codemotion
 

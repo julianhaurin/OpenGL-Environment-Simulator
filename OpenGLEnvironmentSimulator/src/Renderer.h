@@ -26,6 +26,7 @@
 #include "Objects/Model.h"
 #include "Objects/Material.h"
 #include "Utility/utility.h"
+#include "Objects/Light.h"
 
 // represents an OpenGL context and scene
 class Renderer 

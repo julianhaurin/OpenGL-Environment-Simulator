@@ -3,6 +3,7 @@
 
 #include "Model.h"
 
+
 // Public Methods //
 
 Model::Model(const std::string in_objFile, const Material in_material, const uint32_t in_sizeMultiplyer)
@@ -12,6 +13,62 @@ Model::Model(const std::string in_objFile, const Material in_material, const uin
 	  m_Material(in_material)
 {
 	assert(in_sizeMultiplyer >= 1);
+
+	Light light;
+	light.ambient = glm::vec3(0.2f, 0.2f, 0.2f);
+	light.diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	light.specular = glm::vec3(1.0f, 1.0f, 1.0f);
+	light.position = glm::vec3(200.0f, 200.0f, 300.0f);
+	m_Light = light;
+
+	m_cubeVertices = {
+		// positions          // normals           // texture coords
+		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
+		 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f,
+		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
+		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
+
+		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  0.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
+
+		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+		-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+		-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+
+		 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+		 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+		 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+		 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+		 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+
+		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
+		 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  1.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
+
+		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
+		 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  1.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f
+	};
+
+	for (int i = 0; i < m_cubeVertices.size(); i++) {
+		m_cubeVertices[i] *= 10;
+	}
 
 	loadObjData();
 	setUpModel();
@@ -36,10 +93,16 @@ void Model::Render(glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_Pro
 	m_ShaderProgram.SetMat4("u_View", in_ViewMat);
 	m_ShaderProgram.SetMat4("u_Projection", in_ProjeMat);
 
-	// lighting
 	m_ShaderProgram.SetVec3("u_ObjectColor", glm::vec3(0.1f, 0.9f, 0.2f));
+
+	// lighting
+	m_ShaderProgram.SetVec3("u_Light.ambient", m_Light.ambient);
+	m_ShaderProgram.SetVec3("u_Light.diffuse", m_Light.diffuse);
+	m_ShaderProgram.SetVec3("u_Light.specular", m_Light.specular);
+	m_ShaderProgram.SetVec3("u_Light.position", m_Light.position);
+
 	m_ShaderProgram.SetVec3("u_LightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-	m_ShaderProgram.SetVec3("u_LightPosition", glm::vec3(200.0f, 200.0f, 300.0f));
+	//m_ShaderProgram.SetVec3("u_LightPosition", glm::vec3(200.0f, 200.0f, 300.0f));
 	m_ShaderProgram.SetVec3("u_ViewPosition", in_ViewPos);
 
 	// material 
@@ -150,7 +213,8 @@ void Model::setUpModel() {
 
 	// vbo set up
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(m_VertexData[0]) * m_VertexData.size(), &m_VertexData[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(m_cubeVertices[0]) * m_cubeVertices.size(), &m_cubeVertices[0], GL_STATIC_DRAW);
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(m_VertexData[0]) * m_VertexData.size(), &m_VertexData[0], GL_STATIC_DRAW);
 
 	// ebo set up
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
@@ -158,9 +222,14 @@ void Model::setUpModel() {
 
 	// VAO set up
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(m_VertexData[0]) * 6, (GLvoid*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(m_VertexData[0]) * 8, (GLvoid*)0);
 
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(m_VertexData[0]) * 6, (GLvoid*)(3 * sizeof(m_VertexData[0])));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(m_VertexData[0]) * 8, (GLvoid*)(3 * sizeof(m_VertexData[0])));
+
+	//glEnableVertexAttribArray(2);
+	//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(m_VertexData[0]) * 8, (GLvoid*)(6 * sizeof(m_VertexData[0])));
+
+	//unsigned int diffuseMap = loadTexture("../assets/textures/containerDiffuseMap.png");
 
 }
