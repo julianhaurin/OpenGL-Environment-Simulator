@@ -1,6 +1,7 @@
 # OpenGL Renderer and Environment Simulator
 
 C++ OpenGL renderer that supports lighting, texturing, fully functional and user-controlled camera, model loading, and water wave simulations (more to come!). 
+See more of my projects at: https://julianhaurin.onrender.com/
 
 ## Water Wave Simulation:
 

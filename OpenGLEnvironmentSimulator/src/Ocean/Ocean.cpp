@@ -197,7 +197,7 @@ void Ocean::Render(const float time, glm::mat4 in_ModelMat, glm::mat4 in_ViewMat
 
 	//std::cout << "OCEAN LOOP\n";
 	//if (time < 0.5f) EvaluateWavesDFT(time);
-	EvaluateWavesDFT(time);
+	if (time < 0.2) EvaluateWavesDFT(time);
 	//EvaluateWavesFFT(time);
 
 	// update uniforms //

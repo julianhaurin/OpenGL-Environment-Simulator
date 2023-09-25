@@ -19,7 +19,7 @@ Renderer::Renderer()
     }
     std::cout << "[J] - Renderer successfully initialized! \n\n";
 
-    m_Ocean = new Ocean(16, 0.005f, glm::vec2(32.0f, 24.0f), 32);
+    m_Ocean = new Ocean(64, 0.0025f, glm::vec2(1.0f, 10.0f), 48);
     m_TestModel = new Model("./assets/cube.obj", getMaterialEmerald(), 1u);
     //m_TestLightSource = new Model("./assets/cube.obj", 1u);
 
@@ -60,10 +60,10 @@ void Renderer::Run() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(0.01f, 0.01f, 0.01f, 1.0f); // background color
 
-        //m_Ocean->Render(currentFrame, model, view, projection, lightPos, m_Camera.getWorldPos());
+        m_Ocean->Render(currentFrame, model, view, projection, lightPos, m_Camera.getWorldPos());
         //m_Objects[0].Render(currentFrame, model, view, projection, lightPos, m_Camera.getWorldPos());
 
-        m_TestModel->Render(model, view, projection, m_Camera.getWorldPos());
+        //m_TestModel->Render(model, view, projection, m_Camera.getWorldPos());
 
         glfwSwapBuffers(m_Window);
         glfwPollEvents();
