@@ -13,6 +13,7 @@
 // fix order of member init lists EVERYWHERE, make everything const
 // std::cerr instead of std::cout?
 
+#define STB_IMAGE_IMPLEMENTATION
 #include "Renderer.h"
 
 int main() 

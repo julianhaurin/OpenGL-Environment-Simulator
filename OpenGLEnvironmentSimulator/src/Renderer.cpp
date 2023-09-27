@@ -42,7 +42,7 @@ void Renderer::Run() {
     glm::vec3 lightPos(0.0f, 1.0f, 10.0f);
 
     // add models to be rendered
-    auto testModel = std::make_shared<Model>("./assets/cube.obj", getMaterialEmerald(), 1u);
+    auto testModel = std::make_shared<Model>("./assets/vikingRoom.obj", getMaterialEmerald(), "./assets/textures/vikingRoom.png", 10);
     addModel(testModel);
 
     while (glfwWindowShouldClose(m_Window) == false)
@@ -66,7 +66,7 @@ void Renderer::Run() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(0.01f, 0.01f, 0.01f, 1.0f); // background color
 
-        m_Ocean->Render(currentFrame, model, view, projection, lightPos, m_Camera.getWorldPos());
+        //m_Ocean->Render(currentFrame, model, view, projection, lightPos, m_Camera.getWorldPos());
 
         // iterate through render objects - is this best practice?
         for (int i = 0; i < m_RenderObjects.size(); i++) {

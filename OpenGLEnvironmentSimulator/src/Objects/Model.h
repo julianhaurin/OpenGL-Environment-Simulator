@@ -18,6 +18,7 @@
 
 #include "../ShaderHandlers/ShaderProgram.h"
 #include "Material.h"
+#include "Texture.h"
 #include "Light.h"
 #include "../Utility/utility.h"
 
@@ -35,7 +36,7 @@ class Model
 public:
 
 	// in_sizeMultiplyer controls size of object (makes it bigger)
-	Model(const std::string in_objFile, const Material in_material, const uint32_t in_sizeMultiplyer = 1);
+	Model(const std::string in_objFile, const Material in_material, const std::string in_texturePath, const uint32_t in_sizeMultiplyer = 1);
 	~Model();
 
 	void Bind();
@@ -55,6 +56,7 @@ private:
 	std::vector<tinyobj::real_t> m_VertexData; // EBO data
 	std::vector<tinyobj::index_t> m_IndexData; // EBO data
 
+	Texture m_Texture;
 	const Material m_Material;
 	const uint32_t m_vertexPositionMultiplyer;
 

@@ -28,8 +28,9 @@ in vec2 inF_TexCoords;
 
 uniform vec3 u_ObjectColor;
 uniform vec3 u_LightColor;
-// uniform vec3 u_LightPosition;
 uniform vec3 u_ViewPosition;
+
+uniform sampler2D u_TextureData;
 
 out vec4 out_FragColor;
 
@@ -60,4 +61,6 @@ void main()
     // result //
     const vec3 result = (ambientLighting + diffuseLighting + specularLighting) * u_ObjectColor;
     out_FragColor = vec4(result, 0.1f);
+
+    out_FragColor = texture(u_TextureData, inF_TexCoords);
 }

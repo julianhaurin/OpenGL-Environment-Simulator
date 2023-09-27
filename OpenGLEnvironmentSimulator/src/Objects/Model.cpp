@@ -6,13 +6,13 @@
 
 // Public Methods //
 
-Model::Model(const std::string in_objFile, const Material in_material, const uint32_t in_sizeMultiplyer)
+Model::Model(const std::string in_objFile, const Material in_material, const std::string in_texturePath, const uint32_t in_sizeMultiplyer)
 	: m_objFilePath(in_objFile), 
 	  m_ShaderProgram(ShaderProgram("./shaders/vertexShader.vs", "./shaders/fragmentShader.fs")),
 	  m_VBO(0), m_EBO(0), m_VAO(0), m_vertexPositionMultiplyer(in_sizeMultiplyer),
-	  m_Material(in_material)
+	  m_Texture(in_texturePath), m_Material(in_material)
 {
-	assert(in_sizeMultiplyer >= 1);
+	assert(in_sizeMultiplyer >= 0);
 
 	Light light;
 	light.ambient = glm::vec3(0.2f, 0.2f, 0.2f);
@@ -20,55 +20,6 @@ Model::Model(const std::string in_objFile, const Material in_material, const uin
 	light.specular = glm::vec3(1.0f, 1.0f, 1.0f);
 	light.position = glm::vec3(200.0f, 200.0f, 300.0f);
 	m_Light = light;
-
-	m_cubeVertices = {
-		// positions          // normals           // texture coords
-		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f,
-		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
-		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
-
-		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
-		 0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  0.0f,
-		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
-		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
-
-		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
-		-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
-		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
-		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
-		-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
-		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
-
-		 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
-
-		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  1.0f,
-		 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
-		 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  0.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
-
-		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
-		 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  1.0f,
-		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
-		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f
-	};
-
-	for (int i = 0; i < m_cubeVertices.size(); i++) {
-		m_cubeVertices[i] *= 10;
-	}
 
 	loadObjData();
 	setUpModel();
@@ -83,6 +34,7 @@ void Model::Bind() {
 	glBindVertexArray(m_VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
+	m_Texture.Bind();
 
 }
 
@@ -158,24 +110,20 @@ bool Model::loadObjData() {
 		for (size_t faceIdx = 0; faceIdx < shapes[shapeIdx].mesh.num_face_vertices.size(); faceIdx++) {
 			size_t faceVertices = size_t(shapes[shapeIdx].mesh.num_face_vertices[faceIdx]);
 
+			// loop over vertices in face
 			for (size_t vertIdx = 0; vertIdx < faceVertices; vertIdx++) {
 
 				tinyobj::index_t index = shapes[shapeIdx].mesh.indices[idxOffset + vertIdx];
-				
-				// EBO data
-				m_IndexData.push_back(index);
 
 				// VBO data //
 
 				// vertex position
-				m_VertexData.push_back(attrib.vertices[3 * (float)index.vertex_index] * m_vertexPositionMultiplyer); // + 0
-				m_VertexData.push_back(attrib.vertices[3 * (float)index.vertex_index + 1] * m_vertexPositionMultiplyer);
-				m_VertexData.push_back(attrib.vertices[3 * (float)index.vertex_index + 2] * m_vertexPositionMultiplyer);
-
-				// rgb color value
-				//m_VertexData.push_back(attrib.colors[3 * size_t(index.vertex_index)]); // + 0
-				//m_VertexData.push_back(attrib.colors[3 * size_t(index.vertex_index) + 1]);
-				//m_VertexData.push_back(attrib.colors[3 * size_t(index.vertex_index) + 2]);
+				m_VertexData.push_back(attrib.vertices[3 * (size_t)index.vertex_index] * m_vertexPositionMultiplyer); // + 0
+				m_VertexData.push_back(attrib.vertices[3 * (size_t)index.vertex_index + 1] * m_vertexPositionMultiplyer);
+				m_VertexData.push_back(attrib.vertices[3 * (size_t)index.vertex_index + 2] * m_vertexPositionMultiplyer);
+				
+				// EBO data
+				m_IndexData.push_back(index);
 	
 				// normal data
 				if (index.normal_index >= 0) {
@@ -184,19 +132,21 @@ bool Model::loadObjData() {
 					m_VertexData.push_back(attrib.normals[3 * size_t(index.normal_index) + 2]);
 				}
 
+				if (index.texcoord_index >= 0) {
+					m_VertexData.push_back(attrib.texcoords[2 * size_t(index.texcoord_index) + 0]);
+					m_VertexData.push_back(attrib.texcoords[2 * size_t(index.texcoord_index) + 1]);
+
+				}
 			}
 
 			idxOffset += faceVertices;
+
+			//shapes[shapeIdx].mesh.material_ids[faceIdx];
 
 		}
 	}
 
 	std::cout << "[J] - Successfully loaded model obj data! \n";
-
-	//for (int i = 0; i < m_VertexData.size(); i++) {
-	//	std::cout << m_VertexData[i] << " ";
-	//	if ((i+1) % 3 == 0) std::cout << "\n";
-	//}
 
 	return true;
 
@@ -213,8 +163,8 @@ void Model::setUpModel() {
 
 	// vbo set up
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(m_cubeVertices[0]) * m_cubeVertices.size(), &m_cubeVertices[0], GL_STATIC_DRAW);
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(m_VertexData[0]) * m_VertexData.size(), &m_VertexData[0], GL_STATIC_DRAW);
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(m_cubeVertices[0]) * m_cubeVertices.size(), &m_cubeVertices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(m_VertexData[0]) * m_VertexData.size(), &m_VertexData[0], GL_STATIC_DRAW);
 
 	// ebo set up
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
@@ -227,8 +177,8 @@ void Model::setUpModel() {
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(m_VertexData[0]) * 8, (GLvoid*)(3 * sizeof(m_VertexData[0])));
 
-	//glEnableVertexAttribArray(2);
-	//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(m_VertexData[0]) * 8, (GLvoid*)(6 * sizeof(m_VertexData[0])));
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(m_VertexData[0]) * 8, (GLvoid*)(6 * sizeof(m_VertexData[0])));
 
 	//unsigned int diffuseMap = loadTexture("../assets/textures/containerDiffuseMap.png");
 
