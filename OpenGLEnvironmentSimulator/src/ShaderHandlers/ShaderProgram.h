@@ -28,7 +28,7 @@ private:
 	std::string m_vertShaderCode;
 	std::string m_fragShaderCode;
 
-	void InitializeShaders(); // compiles and links shaders into program object
+	void InitializeShaders() override; // compiles and links shaders into program object
 
 	// reads source code from provided files and updates member variables
 	void retrieveShaderSourceCode(const char* in_vertexShaderPath, const char* in_fragmentShaderPath);

@@ -30,10 +30,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-//#include "../Utility/PGFFT/PGFFT.h"
-#include "../Utility/PocketFFT/PocketFFT.h"
-
-#include "../Utility/FFT.h"
+#include "../Utility/FFT/FFT.h"
 #include "../ShaderHandlers/ShaderProgram.h"
 #include "../ShaderHandlers/ComputeShader.h"
 
@@ -110,8 +107,8 @@ private:
 	std::vector<std::complex<float>> m_HTildeDZ;
 
 	// PocketFFT
-	const pocketfft::shape_t m_PFFT_shape;
-	const pocketfft::stride_t m_PFFT_stride;
+	//const pocketfft::shape_t m_PFFT_shape;
+	//const pocketfft::stride_t m_PFFT_stride;
 
 	void Initialize();
 	void DeallocateResources();

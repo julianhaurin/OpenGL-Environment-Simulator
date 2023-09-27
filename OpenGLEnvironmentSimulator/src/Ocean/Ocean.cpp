@@ -45,10 +45,10 @@ Ocean::Ocean(const uint32_t gridDimensions, const float waveHeight_A, glm::vec2 
 	  m_HTildeSlopeX(std::vector<std::complex<float>>(m_GridSideDimension * m_GridSideDimension)),
 	  m_HTildeSlopeZ(std::vector<std::complex<float>>(m_GridSideDimension * m_GridSideDimension)),
 	  m_HTildeDX(std::vector<std::complex<float>>(m_GridSideDimension * m_GridSideDimension)),
-	  m_HTildeDZ(std::vector<std::complex<float>>(m_GridSideDimension * m_GridSideDimension)),
+	  m_HTildeDZ(std::vector<std::complex<float>>(m_GridSideDimension * m_GridSideDimension))
 	  // Pocket FFT
-	  m_PFFT_shape(static_cast<pocketfft::shape_t>(m_GridSideDimension)),
-	  m_PFFT_stride(sizeof(float))
+	  //m_PFFT_shape(static_cast<pocketfft::shape_t>(m_GridSideDimension)),
+	  //m_PFFT_stride(sizeof(float))
 {
 	assert(m_GridSideDimension && !(m_GridSideDimension & (m_GridSideDimension - 1))); // m_GridSideDimension == power of 2
 	
@@ -468,11 +468,11 @@ void Ocean::EvaluateWavesFFT(const float time) {
 		//m_PGFFT.apply(&m_HTildeDX[0], &m_HTildeDX[0]);
 		//m_PGFFT.apply(&m_HTildeDZ[0], &m_HTildeDZ[0]);
 
-		pocketfft::c2c(m_PFFT_shape, m_PFFT_stride, m_PFFT_stride, m_PFFT_shape, pocketfft::FORWARD, &m_HTilde[0], &m_HTilde[0], 1.0f, 1);
-		pocketfft::c2c(m_PFFT_shape, m_PFFT_stride, m_PFFT_stride, m_PFFT_shape, pocketfft::FORWARD, &m_HTildeSlopeX[0], &m_HTildeSlopeX[0], 1.0f, 1);
-		pocketfft::c2c(m_PFFT_shape, m_PFFT_stride, m_PFFT_stride, m_PFFT_shape, pocketfft::FORWARD, &m_HTildeSlopeZ[0], &m_HTildeSlopeZ[0], 1.0f, 1);
-		pocketfft::c2c(m_PFFT_shape, m_PFFT_stride, m_PFFT_stride, m_PFFT_shape, pocketfft::FORWARD, &m_HTildeDX[0], &m_HTildeDX[0], 1.0f, 1);
-		pocketfft::c2c(m_PFFT_shape, m_PFFT_stride, m_PFFT_stride, m_PFFT_shape, pocketfft::FORWARD, &m_HTildeDZ[0], &m_HTildeDZ[0], 1.0f, 1);
+		//pocketfft::c2c(m_PFFT_shape, m_PFFT_stride, m_PFFT_stride, m_PFFT_shape, pocketfft::FORWARD, &m_HTilde[0], &m_HTilde[0], 1.0f, 1);
+		//pocketfft::c2c(m_PFFT_shape, m_PFFT_stride, m_PFFT_stride, m_PFFT_shape, pocketfft::FORWARD, &m_HTildeSlopeX[0], &m_HTildeSlopeX[0], 1.0f, 1);
+		//pocketfft::c2c(m_PFFT_shape, m_PFFT_stride, m_PFFT_stride, m_PFFT_shape, pocketfft::FORWARD, &m_HTildeSlopeZ[0], &m_HTildeSlopeZ[0], 1.0f, 1);
+		//pocketfft::c2c(m_PFFT_shape, m_PFFT_stride, m_PFFT_stride, m_PFFT_shape, pocketfft::FORWARD, &m_HTildeDX[0], &m_HTildeDX[0], 1.0f, 1);
+		//pocketfft::c2c(m_PFFT_shape, m_PFFT_stride, m_PFFT_stride, m_PFFT_shape, pocketfft::FORWARD, &m_HTildeDZ[0], &m_HTildeDZ[0], 1.0f, 1);
 
 		//m_FFT.ComputeFFT(m_HTilde, m_HTilde, 1, m_prime * N);
 		//m_FFT.ComputeFFT(m_HTildeSlopeX, m_HTildeSlopeX, 1, m_prime * N);
@@ -487,11 +487,11 @@ void Ocean::EvaluateWavesFFT(const float time) {
 		//m_PGFFT.apply(&m_HTildeDX[0], &m_HTildeDX[0]);
 		//m_PGFFT.apply(&m_HTildeDZ[0], &m_HTildeDZ[0]);
 
-		pocketfft::c2c(m_PFFT_shape, m_PFFT_stride, m_PFFT_stride, m_PFFT_shape, pocketfft::FORWARD, &m_HTilde[0], &m_HTilde[0], 1.0f, 1);
-		pocketfft::c2c(m_PFFT_shape, m_PFFT_stride, m_PFFT_stride, m_PFFT_shape, pocketfft::FORWARD, &m_HTildeSlopeX[0], &m_HTildeSlopeX[0], 1.0f, 1);
-		pocketfft::c2c(m_PFFT_shape, m_PFFT_stride, m_PFFT_stride, m_PFFT_shape, pocketfft::FORWARD, &m_HTildeSlopeZ[0], &m_HTildeSlopeZ[0], 1.0f, 1);
-		pocketfft::c2c(m_PFFT_shape, m_PFFT_stride, m_PFFT_stride, m_PFFT_shape, pocketfft::FORWARD, &m_HTildeDX[0], &m_HTildeDX[0], 1.0f, 1);
-		pocketfft::c2c(m_PFFT_shape, m_PFFT_stride, m_PFFT_stride, m_PFFT_shape, pocketfft::FORWARD, &m_HTildeDZ[0], &m_HTildeDZ[0], 1.0f, 1);
+		//pocketfft::c2c(m_PFFT_shape, m_PFFT_stride, m_PFFT_stride, m_PFFT_shape, pocketfft::FORWARD, &m_HTilde[0], &m_HTilde[0], 1.0f, 1);
+		//pocketfft::c2c(m_PFFT_shape, m_PFFT_stride, m_PFFT_stride, m_PFFT_shape, pocketfft::FORWARD, &m_HTildeSlopeX[0], &m_HTildeSlopeX[0], 1.0f, 1);
+		//pocketfft::c2c(m_PFFT_shape, m_PFFT_stride, m_PFFT_stride, m_PFFT_shape, pocketfft::FORWARD, &m_HTildeSlopeZ[0], &m_HTildeSlopeZ[0], 1.0f, 1);
+		//pocketfft::c2c(m_PFFT_shape, m_PFFT_stride, m_PFFT_stride, m_PFFT_shape, pocketfft::FORWARD, &m_HTildeDX[0], &m_HTildeDX[0], 1.0f, 1);
+		//pocketfft::c2c(m_PFFT_shape, m_PFFT_stride, m_PFFT_stride, m_PFFT_shape, pocketfft::FORWARD, &m_HTildeDZ[0], &m_HTildeDZ[0], 1.0f, 1);
 
 		//m_FFT.ComputeFFT(m_HTilde, m_HTilde, N, n_prime);
 		//m_FFT.ComputeFFT(m_HTildeSlopeX, m_HTildeSlopeX, N, n_prime);
@@ -571,43 +571,4 @@ void Ocean::EvaluateWavesFFT(const float time) {
 	}
 
 }
-
-
-// ***** DEPRECATED *****
-//float uniformRandomVariable() {
-//	float randNum = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-//	return randNum;
-//}
-//
-//std::complex<float> gaussianRandomVariable() {
-//	float x1, x2, w;
-//	do {
-//		x1 = 2.f * uniformRandomVariable() - 1.f;
-//		x2 = 2.f * uniformRandomVariable() - 1.f;
-//		w = x1 * x1 + x2 * x2;
-//	} while (w >= 1.f);
-//	w = sqrt((-2.f * log(w)) / w);
-//	std::complex<float> complexNum(x1 * w, x2 * w);
-//	return complexNum;
-//
-//}
-
-//std::cout << "TEST VERTICES: \n";
-	//for (int i = 0; i < vertices.size(); i++) {
-	//	std::cout << vertices[i] << ", ";
-	//	if (i % 3 == 0) std::cout << "\n";
-	//}
-	//std::cout << "TEST INDICES: \n";
-	//for (int i = 0; i < indices.size(); i++) {
-	//	std::cout << indices[i] << ", ";
-	//	if (i % 3 == 0) std::cout << "\n";
-	//}
-	//std::cout << "VERTICES: \n";
-	//for (int i = 0; i < m_Vertices.size(); i++) {
-	//	std::cout << m_Vertices[i].x << ", " << m_Vertices[i].y << ", " << m_Vertices[i].z << ", \n";
-	//}
-	//std::cout << "INDICES: \n";
-	//for (int i = 0; i < m_Indices.size(); i++) {
-	//	printUVec3(m_Indices[i]);
-	//}
 

@@ -15,7 +15,7 @@ private:
 	std::string m_compShaderCode;
 
 	// compiles compute shader and checks for errors
-	void InitializeShaders();
+	void InitializeShaders() override;
 
 	// reads source code from provided file and updates member variable
 	void retrieveShaderSourceCode(const char* in_compShaderPath);

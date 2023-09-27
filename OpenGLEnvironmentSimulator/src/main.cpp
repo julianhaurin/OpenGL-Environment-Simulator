@@ -1,5 +1,10 @@
 // OpenGL Environment Simulator - Julian Haurin
 
+// Sources:
+// learnopengl.com
+// cherno
+// others on github
+
 // Notes:
 // version might not be right in shaders
 // lots of printing good for debugging - remove in release version

@@ -1,13 +1,13 @@
 
+//*** work in progress **//
+
 #include "ComputeShader.h"
 
 ComputeShader::ComputeShader(const char* in_compShaderPath) 
 	: m_compShaderCode("")
 {
-	
 	retrieveShaderSourceCode(in_compShaderPath);
 	InitializeShaders();
-	
 
 }
 
