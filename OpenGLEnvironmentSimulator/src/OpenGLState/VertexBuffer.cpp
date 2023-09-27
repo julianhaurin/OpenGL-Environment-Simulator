@@ -1,5 +1,5 @@
 
-// VBO Class - 9/10/23
+// VBO Class
 
 #include "VertexBuffer.h"
 

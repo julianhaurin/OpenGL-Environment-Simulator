@@ -2,14 +2,8 @@
 #pragma once
 
 // Notes:
-// do I need to add functions like:
-//		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//		glClearColor(0.05f, 0.2f, 0.3f, 1.0f);
-// to the Update() function?
 // update 9/6 - i think the destructor is being called??? like when its not supposed to
-// which is why m_GridVBO wont render but VBO will
-// could also use pocketfft or kissfft or fftw
-// change order of member initalization list in .cpp file
+// could use pocketfft or kissfft or fftw
 
 // UPDATE RENDER() FUNCTION IN INTERFACE 
 
@@ -34,8 +28,8 @@
 #include "../ShaderHandlers/ShaderProgram.h"
 #include "../ShaderHandlers/ComputeShader.h"
 
-#include "../VertexBuffer.h"
-#include "../ElementBuffer.h"
+#include "../OpenGLState/VertexBuffer.h"
+#include "../OpenGLState/ElementBuffer.h"
 
 
 // data within ocean grid vertex
@@ -68,14 +62,9 @@ public:
 
 private:
 
-	//Ocean();
-
 	// shader program
 	ShaderProgram m_OceanShaderProgram;
 	//ComputeShader m_OceanComputeShader;
-
-	//VertexBuffer m_VBO;
-	//ElementBuffer m_EBO;
 
 	GLuint m_GridVBO;
 	GLuint m_GridVAO;
@@ -98,14 +87,6 @@ private:
 	const glm::vec2 m_windDir_w;
 	const float m_Length;
 
-	// FFT data
-	FFT m_FFT;
-	std::vector<std::complex<float>> m_HTilde;
-	std::vector<std::complex<float>> m_HTildeSlopeX;
-	std::vector<std::complex<float>> m_HTildeSlopeZ;
-	std::vector<std::complex<float>> m_HTildeDX;
-	std::vector<std::complex<float>> m_HTildeDZ;
-
 	// PocketFFT
 	//const pocketfft::shape_t m_PFFT_shape;
 	//const pocketfft::stride_t m_PFFT_stride;
@@ -122,6 +103,6 @@ private:
 	heightDisplacementNormal evalWaveData(glm::vec2 x, float time);
 	// evaluates new wave height
 	void EvaluateWavesDFT(const float time); // discrete fourier transform
-	void EvaluateWavesFFT(const float time); // fast fourier transform
+	//void EvaluateWavesFFT(const float time); // fast fourier transform
 
 };
