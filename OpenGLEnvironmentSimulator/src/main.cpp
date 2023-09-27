@@ -1,4 +1,4 @@
-// OpenGL Environment Simulator - Julian Haurin - 8/17/23
+// OpenGL Environment Simulator - Julian Haurin
 
 // Notes:
 // version might not be right in shaders
@@ -19,8 +19,8 @@
 int main() 
 {
 
-	Renderer Monke = Renderer();
-	Monke.Run();
+	Renderer superDuperAwesomeRenderer = Renderer();
+	superDuperAwesomeRenderer.Run();
 	return EXIT_SUCCESS;
 
 }

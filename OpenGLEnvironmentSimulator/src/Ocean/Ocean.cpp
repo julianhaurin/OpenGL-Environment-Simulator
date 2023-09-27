@@ -195,10 +195,7 @@ void Ocean::Initialize() {
 
 void Ocean::Render(const float time, glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat, glm::vec3 in_LightPos, glm::vec3 in_CamPos) { // render function
 
-	//std::cout << "OCEAN LOOP\n";
-	//if (time < 0.5f) EvaluateWavesDFT(time);
-	if (time < 0.2) EvaluateWavesDFT(time);
-	//EvaluateWavesFFT(time);
+	EvaluateWavesDFT(time);
 
 	// update uniforms //
 	m_OceanShaderProgram.UseProgram();

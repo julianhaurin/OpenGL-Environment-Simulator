@@ -1,8 +1,8 @@
 
 #include "Camera.h"
 
-const float Camera::initSpeed = 0.1f;
-const float Camera::initMouseSensitivity = 0.01f;
+const float Camera::initSpeed = 25.0f;
+const float Camera::initMouseSensitivity = 25.0f;
 const float Camera::initZoom = 45.0f;
 
 Camera::Camera(glm::vec3 position, glm::vec3 worldUp, float yaw, float pitch)

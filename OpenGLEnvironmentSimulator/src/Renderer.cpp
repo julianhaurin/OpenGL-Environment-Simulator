@@ -4,11 +4,12 @@
 const uint32_t Renderer::ScreenHeight = 600;
 const uint32_t Renderer::ScreenWidth = 800;
 
-// Public Methods ------------------------------ //
+// Public Methods //
 
 Renderer::Renderer()
     : m_Camera(Camera(glm::vec3(-40.0f, 48.0f, 34.0f), glm::vec3(0.0f, 1.0f, 0.0f), -41.0f, -42.5f)),
-      m_deltaTime(0.0f), m_lastFrame(0.0f),
+      m_RenderObjects(std::vector<std::shared_ptr<Model>>()),
+      m_deltaTime(0.0f), m_lastFrame(0.0f), m_frameCount(0),
       m_lastY(ScreenHeight / 2.0f), m_lastX(ScreenWidth / 2.0f)
 {
 
@@ -19,18 +20,19 @@ Renderer::Renderer()
     }
     std::cout << "[J] - Renderer successfully initialized! \n\n";
 
-    m_Ocean = new Ocean(64, 0.0025f, glm::vec2(1.0f, 10.0f), 48);
-    m_TestModel = new Model("./assets/cube.obj", getMaterialEmerald(), 1u);
-    //m_TestLightSource = new Model("./assets/cube.obj", 1u);
+    m_Ocean = std::make_shared<Ocean>(8, 0.0025f, glm::vec2(1.0f, 10.0f), 16);
 
 }
 
 Renderer::~Renderer()
 {
-    delete m_Ocean;
-    delete m_TestModel;
-    delete m_TestLightSource;
     glfwCleanUp(m_Window);
+}
+
+void Renderer::addModel(std::shared_ptr<Model> in_model_p) {
+    if (in_model_p != nullptr) {
+        m_RenderObjects.push_back(in_model_p);
+    }
 }
 
 // render loop
@@ -39,9 +41,13 @@ void Renderer::Run() {
     std::cout << "[J] - Beginning render loop... \n";
     glm::vec3 lightPos(0.0f, 1.0f, 10.0f);
 
+    // add models to be rendered
+    auto testModel = std::make_shared<Model>("./assets/cube.obj", getMaterialEmerald(), 1u);
+    addModel(testModel);
+
     while (glfwWindowShouldClose(m_Window) == false)
     {
-        float currentFrame = m_lastFrame + 0.1f; // static_cast<float>(glfwGetTime());
+        float currentFrame = static_cast<float>(glfwGetTime());
         m_deltaTime = currentFrame - m_lastFrame;
         m_lastFrame = currentFrame;
 
@@ -61,20 +67,24 @@ void Renderer::Run() {
         glClearColor(0.01f, 0.01f, 0.01f, 1.0f); // background color
 
         m_Ocean->Render(currentFrame, model, view, projection, lightPos, m_Camera.getWorldPos());
-        //m_Objects[0].Render(currentFrame, model, view, projection, lightPos, m_Camera.getWorldPos());
 
-        //m_TestModel->Render(model, view, projection, m_Camera.getWorldPos());
+        // iterate through render objects - is this best practice?
+        for (int i = 0; i < m_RenderObjects.size(); i++) {
+            m_RenderObjects[i]->Render(model, view, projection, m_Camera.getWorldPos());
+
+        }
 
         glfwSwapBuffers(m_Window);
         glfwPollEvents();
 
-        //std::cout << "loop ";
-        //std::cout << m_Camera.getWorldPos().x << " " << m_Camera.getWorldPos().y << " " << m_Camera.getWorldPos().z << "\n";
+        m_frameCount++;
 
     }
+
+    std::cout << "[J] - Average (rough) fps: " << (m_frameCount / glfwGetTime()) << std::endl;
 }
 
-// Private Methods ----------------------------- //
+// Private Methods //
 
 // initializes GLFW and creates a GLFW window and OpenGL context, initializes GLEW
 bool Renderer::Initialize() {

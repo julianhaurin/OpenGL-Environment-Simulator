@@ -3,16 +3,18 @@
 
 // Notes:
 // lots of optimizing and updating to do
+// research batch rendering techniques and
+// industry standard for rendering list of objects (model class)
 //
-// should the opengl context (glfw/glew) be created within the Renderer or outside?
-// fix error handling in inititalize function ***
-//
-// glfw callback function workaround stackoverflow.com/questions/7676971/pointing-to-a-function-that-is-a-class-member-glfw-setkeycallback
+// glfw callback function workaround 
+// stackoverflow.com/questions/7676971/pointing-to-a-function-that-is-a-class-member-glfw-setkeycallback
+// 
 // init vbos n shit to 0
 // add fps tracker
 
 #include <iostream>
 #include <cstdint>
+#include <memory>
 
 #define GLEW_STATIC
 #include <GL/glew.h>
@@ -40,24 +42,25 @@ public:
 	~Renderer();
 
 	// render loop
+	void addModel(std::shared_ptr<Model> in_model_p);
 	void Run();
 
 private:
     GLFWwindow* m_Window;
 	Camera m_Camera;
 
-	// Ocean object
-	Ocean* m_Ocean;
+	// list of render objects
+	std::vector<std::shared_ptr<Model>> m_RenderObjects;
 
-	// test model object
-	Model* m_TestModel;
-	Model* m_TestLightSource;
+	// Ocean object
+	std::shared_ptr<Ocean> m_Ocean;
 
     float m_lastY;
     float m_lastX;
 
 	float m_deltaTime;
 	float m_lastFrame;
+	float m_frameCount;
 
 	// initializes GLFW and creates a GLFW window and OpenGL context, initializes GLEW
 	bool Initialize();
@@ -71,7 +74,6 @@ private:
 	void glfwCleanUp(GLFWwindow* window);
 
 };
-
 
 //// GLFW callback functions //
 //void glfwMouseCallback(double in_xPos, double in_yPos);
