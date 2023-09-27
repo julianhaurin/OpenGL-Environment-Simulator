@@ -96,6 +96,7 @@ void ShaderProgram::retrieveShaderSourceCode(const char* in_vertexShaderPath, co
 			<< ") failed to successfully read shader files: " << err.what() << std::endl;
 
 	}
+
 }
 
 // checks for shader linking errors

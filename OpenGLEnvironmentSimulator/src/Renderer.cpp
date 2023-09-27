@@ -7,7 +7,8 @@ const uint32_t Renderer::ScreenWidth = 800;
 // Public Methods //
 
 Renderer::Renderer()
-    : m_Camera(Camera(glm::vec3(-40.0f, 48.0f, 34.0f), glm::vec3(0.0f, 1.0f, 0.0f), -41.0f, -42.5f)),
+    : m_Camera(Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f))),
+      // m_Camera(Camera(glm::vec3(-40.0f, 48.0f, 34.0f), glm::vec3(0.0f, 1.0f, 0.0f), -41.0f, -42.5f)),
       m_RenderObjects(std::vector<std::shared_ptr<Model>>()),
       m_deltaTime(0.0f), m_lastFrame(0.0f), m_frameCount(0),
       m_lastY(ScreenHeight / 2.0f), m_lastX(ScreenWidth / 2.0f)
@@ -21,6 +22,7 @@ Renderer::Renderer()
     std::cout << "[J] - Renderer successfully initialized! \n\n";
 
     m_Ocean = std::make_shared<Ocean>(8, 0.0025f, glm::vec2(1.0f, 10.0f), 16);
+    m_SkyBox = std::make_shared<SkyBox>("./assets/skyBox/sunnySky/");
 
 }
 
@@ -66,6 +68,7 @@ void Renderer::Run() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(0.01f, 0.01f, 0.01f, 1.0f); // background color
 
+        m_SkyBox->Render(view, projection);
         //m_Ocean->Render(currentFrame, model, view, projection, lightPos, m_Camera.getWorldPos());
 
         // iterate through render objects - is this best practice?
@@ -78,6 +81,8 @@ void Renderer::Run() {
         glfwPollEvents();
 
         m_frameCount++;
+
+        //printOpenGLErrors();
 
     }
 

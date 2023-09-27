@@ -39,6 +39,7 @@ bool Texture::loadAndGenTexture() {
 
 	if (data == nullptr) {
 		std::cout << "[J] ERROR - Unable to load texture data from path: " << m_texturePath << std::endl;
+		stbi_image_free(data);
 		return false;
 	}
 
@@ -47,7 +48,7 @@ bool Texture::loadAndGenTexture() {
 
 	stbi_image_free(data);
 
-	std::cout << "[J] Successfully loaded texture data from: " << m_texturePath << "\n";
+	std::cout << "[J] - Successfully loaded texture data from: " << m_texturePath << "\n";
 	return true;
 
 }

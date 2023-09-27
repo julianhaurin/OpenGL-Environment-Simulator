@@ -25,6 +25,7 @@
 
 #include "Camera/Camera.h"
 #include "Ocean/Ocean.h"
+#include "Objects/SkyBox.h"
 #include "Objects/Model.h"
 #include "Objects/Material.h"
 #include "Utility/utility.h"
@@ -48,6 +49,8 @@ public:
 private:
     GLFWwindow* m_Window;
 	Camera m_Camera;
+
+	std::shared_ptr<SkyBox> m_SkyBox;
 
 	// list of render objects
 	std::vector<std::shared_ptr<Model>> m_RenderObjects;
