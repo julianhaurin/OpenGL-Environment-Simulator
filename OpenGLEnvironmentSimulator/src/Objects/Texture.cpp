@@ -35,7 +35,7 @@ bool Texture::loadAndGenTexture() {
 	setTexParams();
 
 	stbi_set_flip_vertically_on_load(true);
-	unsigned char* data = stbi_load(m_texturePath.c_str(), &m_width, &m_height, &m_nrChannels, 0);
+	unsigned char* data = stbi_load(m_texturePath.c_str(), &m_width, &m_height, &m_nrChannels, 3);
 
 	if (data == nullptr) {
 		std::cout << "[J] ERROR - Unable to load texture data from path: " << m_texturePath << std::endl;
@@ -43,7 +43,7 @@ bool Texture::loadAndGenTexture() {
 		return false;
 	}
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	stbi_image_free(data);

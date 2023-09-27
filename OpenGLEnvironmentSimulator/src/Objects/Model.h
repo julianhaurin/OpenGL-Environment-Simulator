@@ -36,7 +36,7 @@ class Model
 public:
 
 	// in_sizeMultiplyer controls size of object (makes it bigger)
-	Model(const std::string in_objFile, const Material in_material, const std::string in_texturePath, const uint32_t in_sizeMultiplyer = 1);
+	Model(const std::string in_objFile, const Material in_material, const std::string in_texturePath, const float in_sizeMultiplyer = 1);
 	~Model();
 
 	void Bind();
@@ -58,7 +58,7 @@ private:
 
 	Texture m_Texture;
 	const Material m_Material;
-	const uint32_t m_vertexPositionMultiplyer;
+	const float m_vertexPositionMultiplyer;
 
 	Light m_Light;
 

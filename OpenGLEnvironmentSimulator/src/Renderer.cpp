@@ -21,7 +21,7 @@ Renderer::Renderer()
     }
     std::cout << "[J] - Renderer successfully initialized! \n\n";
 
-    m_Ocean = std::make_shared<Ocean>(8, 0.0025f, glm::vec2(1.0f, 10.0f), 16);
+    m_Ocean = std::make_shared<Ocean>(64, 0.0015f, glm::vec2(1.0f, 10.0f), 64);
     m_SkyBox = std::make_shared<SkyBox>("./assets/skyBox/sunnySky/");
 
 }
@@ -41,10 +41,10 @@ void Renderer::addModel(std::shared_ptr<Model> in_model_p) {
 void Renderer::Run() {
 
     std::cout << "[J] - Beginning render loop... \n";
-    glm::vec3 lightPos(0.0f, 1.0f, 10.0f);
+    glm::vec3 lightPos(100.0f, 300.0f, 200.0f);
 
     // add models to be rendered
-    auto testModel = std::make_shared<Model>("./assets/vikingRoom.obj", getMaterialEmerald(), "./assets/textures/vikingRoom.png", 10);
+    auto testModel = std::make_shared<Model>("./assets/quack.obj", getMaterialEmerald(), "./assets/textures/quack.png", 0.5f);
     addModel(testModel);
 
     while (glfwWindowShouldClose(m_Window) == false)
@@ -66,9 +66,9 @@ void Renderer::Run() {
 
         // render
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glClearColor(0.01f, 0.01f, 0.01f, 1.0f); // background color
+        glClearColor(0.4f, 0.79f, 0.92f, 1.0f); // background color
 
-        m_SkyBox->Render(view, projection);
+        //m_SkyBox->Render(view, projection);
         //m_Ocean->Render(currentFrame, model, view, projection, lightPos, m_Camera.getWorldPos());
 
         // iterate through render objects - is this best practice?

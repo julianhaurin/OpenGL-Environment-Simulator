@@ -6,7 +6,7 @@
 
 // Public Methods //
 
-Model::Model(const std::string in_objFile, const Material in_material, const std::string in_texturePath, const uint32_t in_sizeMultiplyer)
+Model::Model(const std::string in_objFile, const Material in_material, const std::string in_texturePath, const float in_sizeMultiplyer)
 	: m_objFilePath(in_objFile), 
 	  m_ShaderProgram(ShaderProgram("./shaders/vertexShader.vs", "./shaders/fragmentShader.fs")),
 	  m_VBO(0), m_EBO(0), m_VAO(0), m_vertexPositionMultiplyer(in_sizeMultiplyer),
@@ -16,9 +16,9 @@ Model::Model(const std::string in_objFile, const Material in_material, const std
 
 	Light light;
 	light.ambient = glm::vec3(0.2f, 0.2f, 0.2f);
-	light.diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	light.diffuse = glm::vec3(0.6f, 0.6f, 0.6f);
 	light.specular = glm::vec3(1.0f, 1.0f, 1.0f);
-	light.position = glm::vec3(200.0f, 200.0f, 300.0f);
+	light.position = glm::vec3(00.0f, 00.0f, 300.0f);
 	m_Light = light;
 
 	loadObjData();

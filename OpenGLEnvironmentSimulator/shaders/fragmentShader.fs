@@ -45,22 +45,22 @@ void main()
     // ambient lighting //
     // const float ambientStrength = 0.1f;
     // const vec3 ambientLighting = ambientStrength * u_LightColor;
-    const vec3 ambientLighting = u_Material.ambient * u_Light.ambient;
+    const vec3 ambientLighting = u_Light.ambient;
 
     // diffuse lighting //
     const float diffuse = max(dot(normal, lightDirection), 0.0f);
     // const vec3 diffuseLighting = diffuse * u_LightColor;
-    const vec3 diffuseLighting = u_Material.diffuse * diffuse * u_Light.diffuse;
+    const vec3 diffuseLighting = diffuse * u_Light.diffuse;
 
     // specular lighting //
-    const float spec = pow(max(dot(viewDirection, reflectDirection), 0.0), u_Material.shininess); // 256 = shininess value
+    const float spec = pow(max(dot(viewDirection, reflectDirection), 0.0), 256); // 256 = shininess value
     // const float specularStrength = 0.5f;
     // const vec3 specularLighting = specularStrength * spec * u_LightColor;
-    const vec3 specularLighting = u_Material.specular * spec * u_Light.specular;
+    const vec3 specularLighting = spec * u_Light.specular;
 
     // result //
-    const vec3 result = (ambientLighting + diffuseLighting + specularLighting) * u_ObjectColor;
-    out_FragColor = vec4(result, 0.1f);
+    const vec3 result = (ambientLighting + diffuseLighting + specularLighting);// * u_ObjectColor;
+    // out_FragColor = vec4(result, 0.1f);
 
-    out_FragColor = texture(u_TextureData, inF_TexCoords);
+    out_FragColor = texture(u_TextureData, inF_TexCoords) * vec4(result, 0.1f);
 }
