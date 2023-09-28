@@ -1,15 +1,15 @@
 # OpenGL Renderer and Environment Simulator
 
-C++ OpenGL renderer that supports lighting, texturing, fully functional and user-controlled camera, model loading, and water wave simulations (more to come!). 
+C++ OpenGL renderer that supports Phong lighting, texturing and materials, fully functional and user-controlled camera, model loading, and water wave simulations (more to come!). 
 See more of my projects at: https://julianhaurin.onrender.com/
+
+Trello link: https://trello.com/invite/openglenvironmentsimulator/ATTI683efdd362dddde516f940eb1855ab752AFA5431
 
 ## Water Wave Simulation:
 
 ### Overview
 
 Following Jerry Tessendorf's 2004 paper on non-interactive water wave simulations, the Ocean class (Ocean.h, Ocean.cpp) simulates ocean wind waves using the Phillip's spectrum and the discrete fourier transform. 
-
-Trello link: https://trello.com/invite/openglenvironmentsimulator/ATTI683efdd362dddde516f940eb1855ab752AFA5431
 
 ### Resources
 
