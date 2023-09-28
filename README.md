@@ -15,6 +15,8 @@ Following Jerry Tessendorf's 2004 paper on non-interactive water wave simulation
 
 Learn OpenGL tutorial by Joey de Vries: https://learnopengl.com/
 
+Cherno OpenGL tutorial series: https://www.youtube.com/watch?v=W3gAzLwfIP0&ab_channel=TheCherno
+
 Jerry Tessendorf, Simulating Ocean Water, 2004: https://people.computing.clemson.edu/~jtessen/reports/papers_files/coursenotes2004.pdf
 Jerry Tessdendorf, Interavtive Water Surfaces, 2004: https://people.computing.clemson.edu/~jtessen/reports/papers_files/Interactive_Water_Surfaces.pdf
 
