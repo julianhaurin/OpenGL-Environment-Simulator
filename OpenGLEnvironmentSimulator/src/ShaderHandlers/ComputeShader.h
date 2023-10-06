@@ -6,6 +6,8 @@
 #include <sstream>
 #include <fstream>
 
+#include "../Utility/utility.h"
+
 class ComputeShader : public Shader
 {
 public:

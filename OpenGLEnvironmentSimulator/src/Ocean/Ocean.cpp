@@ -1,9 +1,14 @@
 
 // Source:
 // compute shaders and ssbo:
+// registry.khronos.org/OpenGL/extensions/ARB/ARB_shader_storage_buffer_object.txt
 // geeks3d.com/20140704/tutorial-introduction-to-opengl-4-3-shader-storage-buffers-objects-ssbo-demo/
+// web.engr.oregonstate.edu/~mjb/cs557/Handouts/compute.shader.1pp.pdf
 
 // Notes:
+// 10/3: originally wanted to send data through ssbo as structs but gonna try
+// as image/texture data
+// 
 // mPrime and nPrime are now values within range [0, M] and [0, N] respectively, 
 // and are converted to proper ranges within functions when necessary
 
@@ -25,6 +30,7 @@ void printUVec3(glm::uvec3 vec) {
 // initializes vertices and indices vectors and creates ocean shader program
 Ocean::Ocean(const uint32_t gridDimensions, const float waveHeight_A, glm::vec2 windDir_w, const float length)
 	: m_OceanShaderProgram(ShaderProgram("./shaders/oceanVertShader.glsl", "./shaders/oceanFragShader.glsl")),
+	  m_OceanComputeShader(ComputeShader("./shaders/oceanCompShader.glsl")),
 	  m_GridVBO(0), m_GridVAO(0), m_GridEBO(0), m_GridSSBO(0), m_PositionAttrib(0), m_NormalAttrib(0),
 	  m_GridSideDimension(gridDimensions), m_phillipsConstant_A(waveHeight_A), m_windDir_w(windDir_w), m_Length(length)
 {
@@ -111,12 +117,6 @@ void Ocean::Initialize() {
 	m_PositionAttrib = glGetAttribLocation(m_OceanShaderProgram.getID(), "inV_Pos");
 	m_NormalAttrib = glGetAttribLocation(m_OceanShaderProgram.getID(), "inV_Norm");
 
-	// Initialize compute shader program *** IN PROGRESS
-	//m_OceanComputeShader.UseProgram();
-	//glDispatchCompute(m_GridSideDimension + 1, m_GridSideDimension + 1, 1);
-	//glMemoryBarrier(GL_ALL_BARRIER_BITS); // makes sure data is computed before vertex shader is rendered (i think)
-	//m_EBO.Initialize(m_Indices);
-
 	// generate and bind grid VBO, VAO, and EBO - eventually extrapolate to VBO/EBO classes
 	glGenBuffers(1, &m_GridVBO);
 	glGenBuffers(1, &m_GridEBO);
@@ -137,13 +137,45 @@ void Ocean::Initialize() {
 	glEnableVertexAttribArray(m_NormalAttrib);
 	glVertexAttribPointer(m_NormalAttrib, 3, GL_FLOAT, GL_FALSE, sizeof(OceanVertex), (GLvoid*)vertexPositionOffset);
 
+	// **********
+
+	m_OceanComputeShader.UseProgram();
+	m_OceanComputeShader.SetInt("u_GridSideDimension", m_GridSideDimension);
+	m_OceanComputeShader.SetFloat("u_Length", m_Length);
+	m_OceanComputeShader.SetVec2("u_WindDirection", m_windDir_w);
+	m_OceanComputeShader.SetFloat("u_PhillipsConstant", m_phillipsConstant_A);
+
+	// Initialize shader storage buffer object (SSBO) //
+	glGenBuffers(1, &m_GridSSBO);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_GridSSBO);
+
+	// copy data from m_Vertices into grid ssbo
+	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_Vertices[0]) * m_Vertices.size(), &m_Vertices[0], GL_DYNAMIC_COPY);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_GridSSBO);
+
+	// **********
+
+	printOpenGLErrors();
 	std::cout << "[J] - Ocean object successfully initialized! \n\n";
 
 }
 
 void Ocean::Render(const float time, glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat, glm::vec3 in_LightPos, glm::vec3 in_CamPos) { // render function
 
-	if (time < 0.5f) EvaluateWavesDFT(time);
+	//EvaluateWavesDFT(time);
+
+	// Update SSBO //
+	m_OceanComputeShader.UseProgram();
+	m_OceanComputeShader.SetFloat("u_Time", time);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_GridSSBO);
+
+	glDispatchCompute((m_GridSideDimension + 1) * (m_GridSideDimension + 1), 1, 1); // launches this many work groups
+	glMemoryBarrier(GL_ALL_BARRIER_BITS); // makes sure data is computed before vertex shader is rendered
+
+	// read SSBO data
+	glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(m_Vertices[0]) * m_Vertices.size(), &m_Vertices[0]);
+
+	// *****
 
 	// update uniforms //
 	m_OceanShaderProgram.UseProgram();
@@ -157,14 +189,11 @@ void Ocean::Render(const float time, glm::mat4 in_ModelMat, glm::mat4 in_ViewMat
 	m_OceanShaderProgram.SetVec3("u_LightColor", glm::vec3(1.0f, 1.0f, 1.0f));
 	m_OceanShaderProgram.SetVec3("u_LightPos", in_LightPos);
 
-	// update grid SSBO //
-	//glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_GridSSBO);
-
 	glBindBuffer(GL_ARRAY_BUFFER, m_GridVBO);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(OceanVertex) * m_Vertices.size(), &m_Vertices[0]);
 	glBindVertexArray(m_GridVAO);
 
-	//glDrawArrays(GL_TRIANGLES, 0, 1 * 3);
+	glDrawArrays(GL_TRIANGLES, 0, 1 * 3);
 	glDrawElements(GL_TRIANGLES, m_Indices.size() * 3, GL_UNSIGNED_INT, 0);
 
 }
@@ -200,7 +229,7 @@ float Ocean::phillipsSpectrum(const int32_t mPrime, const int32_t nPrime) const 
 	const float kLen = glm::length(k);
 	const float kLen2 = kLen * kLen;
 	const float kLen4 = kLen2 * kLen2;
-	if (kLen < 0.000001) return 0.0f;
+	if (kLen < 0.000001f) return 0.0f;
 
 	const float kDotw = glm::dot(glm::normalize(k), glm::normalize(m_windDir_w));
 	const float magnitudeKW = glm::length(kDotw);
@@ -210,7 +239,7 @@ float Ocean::phillipsSpectrum(const int32_t mPrime, const int32_t nPrime) const 
 	const float L = (windSpeed_V * windSpeed_V) / gravityConst;
 	const float kL2 = (L * L) * kLen2;
 
-	float damping = 0.001;
+	float damping = 0.001f;
 	float l2 = L * L * damping * damping; // from equation 41
 
 	return m_phillipsConstant_A * (std::exp(-1.0f / (kL2)) / kLen4) 
@@ -280,7 +309,7 @@ heightDisplacementNormal Ocean::evalWaveData(glm::vec2 x, float t) {
 			height = height + hTilde_c;
 			normal = normal + glm::vec3(-kx * hTilde_c.imag(), 0.0f, -kz * hTilde_c.imag());
 
-			if (kLength >= 0.000001) {
+			if (kLength >= 0.000001f) {
 				displacement = displacement + glm::vec2(kx / kLength * hTilde_c.imag(), kz / kLength * hTilde_c.imag());
 			}
 
@@ -325,6 +354,7 @@ void Ocean::EvaluateWavesDFT(const float time) {
 			m_Vertices[index].ny = hdn.normal.y;
 			m_Vertices[index].nz = hdn.normal.z;
 
+			
 			if (n == 0 && m == 0) {
 				m_Vertices[index + N + Nplus1 * N].y = hdn.height.real();
 
@@ -384,5 +414,19 @@ glShaderStorageBlockBinding(m_OceanComputeShader.getProgramID(), blockIndex, ssb
 
 GLenum currentError = glGetError();
 if (currentError) std::cout << "[J] ERROR - OPENGL: " << currentError << std::endl;
+*/
+
+/* 10/5
+	//GLvoid* ssbo_p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_READ_WRITE); // retrieve pointer to buffer memory
+	//std::memcpy(ssbo_p, &m_Vertices[0], sizeof(m_Vertices[0]) * m_Vertices.size()); // *** use std::copy instead
+
+	// retrieve storage block index
+	//GLuint ssboBlockIndex = glGetProgramResourceIndex(m_OceanComputeShader.getProgramID(), GL_SHADER_STORAGE_BLOCK, "ocean_data");
+	//// connect block to SSBO
+	//GLuint ssboBindingPointIndex = 0;
+	//glShaderStorageBlockBinding(m_OceanComputeShader.getProgramID(), ssboBlockIndex, ssboBindingPointIndex);
+	//// bind ssbo
+	//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, ssboBindingPointIndex, m_GridSSBO); // &&&
+	//glUnmapBuffer(GL_SHADER_STORAGE_BUFFER); // &&&
 */
 

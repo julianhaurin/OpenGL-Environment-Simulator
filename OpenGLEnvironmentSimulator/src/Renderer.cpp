@@ -21,8 +21,8 @@ Renderer::Renderer()
     }
     std::cout << "[J] - Renderer successfully initialized! \n\n";
 
-    m_Ocean = std::make_shared<Ocean>(64, 0.0015f, glm::vec2(1.0f, 10.0f), 64);
-    m_SkyBox = std::make_shared<SkyBox>("./assets/skyBox/sunnySky/");
+    m_Ocean = std::make_shared<Ocean>(64, 0.00025f, glm::vec2(1.0f, 10.0f), 48);
+    //m_SkyBox = std::make_shared<SkyBox>("./assets/skyBox/sunnySky/");
 
 }
 
@@ -66,10 +66,10 @@ void Renderer::Run() {
 
         // render
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glClearColor(0.4f, 0.79f, 0.92f, 1.0f); // background color
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f); // background color
 
         //m_SkyBox->Render(view, projection);
-        //m_Ocean->Render(currentFrame, model, view, projection, lightPos, m_Camera.getWorldPos());
+        m_Ocean->Render(currentFrame, model, view, projection, lightPos, m_Camera.getWorldPos());
 
         // iterate through render objects - is this best practice?
         for (int i = 0; i < m_RenderObjects.size(); i++) {
@@ -138,7 +138,7 @@ GLFWwindow* Renderer::setupGLFWWindow(const uint32_t screenWidth, const uint32_t
     std::cout << "[J] - Successfully initialized GLFW! \n";
 
     // glfw window specifications //
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 

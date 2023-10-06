@@ -37,13 +37,13 @@ void main()
     float dotProd = dot(unitNormal, unitLightDir);
     bool isFacing = dotProd > 0.0;
 
-    // out_FragColor = 
-    //    emissiveColor * emissiveStrength +
-    //    ambientColor * ambientStrength +
-    //    diffuseColor * diffuseStrength * max(dotProd, 0.0f) +
-    //    (isFacing ? 
-    //        specularColor * specularStrength * max(pow(dot(unitNormal, unitHalfwayVector), 120.0f), 0.0f) : 
-    //        vec4(0.0f, 0.0f, 0.0f, 0.0f));
+    out_FragColor = 
+        emissiveColor * emissiveStrength +
+        ambientColor * ambientStrength +
+        diffuseColor * diffuseStrength * max(dotProd, 0.0f) +
+        (isFacing ? 
+            specularColor * specularStrength * max(pow(dot(unitNormal, unitHalfwayVector), 120.0f), 0.0f) : 
+            vec4(0.0f, 0.0f, 0.0f, 0.0f));
 
     vec3 viewDir = normalize(u_CameraWorldPos - inF_FragPos);
     float fresnelEffect = 0.05f + 0.95f * pow(1.0f - dot(unitNormal, viewDir), 1000.0f);
@@ -60,14 +60,14 @@ void main()
         color.z += color.z * abs(inF_YPosition) * 100.0f;
     }
 
-    out_FragColor = vec4(color, 1.0f);
+    //out_FragColor = vec4(color, 1.0f);
 
-    float colorModifer = 10 * inF_YPosition + 75.0f;
-    out_FragColor = vec4(0.1f, colorModifer / 100.0f, 0.9f - colorModifer / 900.0f, 1.0f);
-    out_FragColor *= vec4(1.0f, 0.8f, 1.1f, 1.0f);
+    //float colorModifer = 10 * inF_YPosition + 75.0f;
+    //out_FragColor = vec4(0.1f, colorModifer / 100.0f, 0.9f - colorModifer / 900.0f, 1.0f);
+    //out_FragColor *= vec4(1.0f, 0.8f, 1.1f, 1.0f);
 
-    sky *= out_FragColor.z;
-    // out_FragColor *= vec4(sky, 1.0f);
+    //sky *= out_FragColor.z;
+    //out_FragColor *= vec4(sky, 1.0f);
 
 }
 

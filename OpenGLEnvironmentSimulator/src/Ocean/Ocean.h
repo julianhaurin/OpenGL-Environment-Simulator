@@ -35,10 +35,15 @@
 // data within ocean grid vertex
 struct OceanVertex {
 	GLfloat x, y, z; // current position
+	GLfloat padding1;
 	GLfloat ox, oy, oz; // original position (for offset calc)
+	GLfloat padding2;
 	GLfloat nx, ny, nz; // normal
+	GLfloat padding3;
 	GLfloat a, b, c; // htilde
+	GLfloat padding4;
 	GLfloat _a, _b, _c; // discrete fourier transform //
+	GLfloat padding5;
 
 };
 
@@ -64,7 +69,7 @@ private:
 
 	// shader program
 	ShaderProgram m_OceanShaderProgram;
-	//ComputeShader m_OceanComputeShader;
+	ComputeShader m_OceanComputeShader;
 
 	GLuint m_GridVBO;
 	GLuint m_GridVAO;
