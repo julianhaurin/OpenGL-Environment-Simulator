@@ -7,11 +7,12 @@ const uint32_t Renderer::ScreenWidth = 800;
 // Public Methods //
 
 Renderer::Renderer()
-    : m_Camera(Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f))),
-      // m_Camera(Camera(glm::vec3(-40.0f, 48.0f, 34.0f), glm::vec3(0.0f, 1.0f, 0.0f), -41.0f, -42.5f)),
+    : // m_Camera(Camera(glm::vec3(-40.0f, 48.0f, 34.0f), glm::vec3(0.0f, 1.0f, 0.0f), -41.0f, -42.5f)),
+      m_Camera(Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f))),
       m_RenderObjects(std::vector<std::shared_ptr<Model>>()),
-      m_deltaTime(0.0f), m_lastFrame(0.0f), m_frameCount(0),
-      m_lastY(ScreenHeight / 2.0f), m_lastX(ScreenWidth / 2.0f)
+      m_deltaTime(0.0f), m_currentFrame(0.0f), m_lastFrame(0.0f), m_frameCount(0),
+      m_lastY(ScreenHeight / 2.0f), m_lastX(ScreenWidth / 2.0f),
+      m_Model(glm::mat4(1.0f)), m_View(glm::mat4(1.0f)), m_Projection(glm::mat4(1.0f))
 {
 
     // initializes GLFW, creates OpenGL context and GLFW window, initializes GLEW //
@@ -21,7 +22,18 @@ Renderer::Renderer()
     }
     std::cout << "[J] - Renderer successfully initialized! \n\n";
 
+    m_ShadowMap = std::make_shared<ShadowMap>(1024, 1024);
     m_Ocean = std::make_shared<Ocean>(64, 0.00025f, glm::vec2(1.0f, 10.0f), 48);
+
+    // add scene models //
+    std::shared_ptr<Model> duckModel 
+        = std::make_shared<Model>("./assets/quack.obj", getMaterialEmerald(), "./assets/textures/quack.png", 0.5f);
+    std::shared_ptr<Model> floor 
+        = std::make_shared<Model>("./assets/floor.obj", 3);
+
+    addModel(duckModel);
+    addModel(floor);
+
     //m_SkyBox = std::make_shared<SkyBox>("./assets/skyBox/sunnySky/");
 
 }
@@ -40,56 +52,77 @@ void Renderer::addModel(std::shared_ptr<Model> in_model_p) {
 // render loop
 void Renderer::Run() {
 
-    std::cout << "[J] - Beginning render loop... \n";
     glm::vec3 lightPos(100.0f, 300.0f, 200.0f);
 
-    // add models to be rendered
-    auto testModel = std::make_shared<Model>("./assets/quack.obj", getMaterialEmerald(), "./assets/textures/quack.png", 0.5f);
-    addModel(testModel);
-
+    std::cout << "[J] - Beginning render loop... \n";
     while (glfwWindowShouldClose(m_Window) == false)
     {
-        float currentFrame = static_cast<float>(glfwGetTime());
-        m_deltaTime = currentFrame - m_lastFrame;
-        m_lastFrame = currentFrame;
-
+        // frame rendering setup //
+        configureFrameTimes();
         processKeyboardInputs();
-        
-        // model, view, and projection matrices
-        glm::mat4 model = glm::mat4(1.0f);
-        glm::mat4 view = m_Camera.CalculateViewMatrix();
-        glm::mat4 projection = glm::perspective(glm::radians(
-            m_Camera.getZoom()), 
-            static_cast<float>(ScreenWidth) / static_cast<float>(ScreenWidth), 
-            0.1f, 255.0f
-        );
+        configureRenderMatrices();
 
-        // render
+        // Render scene to depth map //
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        m_ShadowMap->PrepareRendering(); // sets up shadow map rendering
+
+        // render all objects in objects list
+        for (int i = 0; i < m_RenderObjects.size(); i++) {
+            m_RenderObjects[i]->Render(m_Model, m_View, m_Projection, m_Camera.getWorldPos(), m_ShadowMap->getLightSpaceMatrix(), false);
+
+        }
+
+        // ************************* //
+
+        // Render scene with shadow mapping (using depth map) //
+        glViewport(0, 0, ScreenWidth, ScreenWidth); // sets viewport for this framebuffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f); // background color
 
-        //m_SkyBox->Render(view, projection);
-        m_Ocean->Render(currentFrame, model, view, projection, lightPos, m_Camera.getWorldPos());
-
+        //m_Ocean->Render(m_currentFrame, m_Model, m_View, m_Projection, lightPos, m_Camera.getWorldPos());
+        
         // iterate through render objects - is this best practice?
         for (int i = 0; i < m_RenderObjects.size(); i++) {
-            m_RenderObjects[i]->Render(model, view, projection, m_Camera.getWorldPos());
+            m_RenderObjects[i]->Render(m_Model, m_View, m_Projection, m_Camera.getWorldPos(), m_ShadowMap->getLightSpaceMatrix());
 
         }
+
 
         glfwSwapBuffers(m_Window);
         glfwPollEvents();
 
+        // ************************************************** //
+
+        printOpenGLErrors();
         m_frameCount++;
-
-        //printOpenGLErrors();
-
     }
 
     std::cout << "[J] - Average (rough) fps: " << (m_frameCount / glfwGetTime()) << std::endl;
 }
 
 // Private Methods //
+
+// Configures deltaTime, lastFrame, and currentFrame
+void Renderer::configureFrameTimes() {
+
+    m_currentFrame = static_cast<float>(glfwGetTime());
+    m_deltaTime = m_currentFrame - m_lastFrame;
+    m_lastFrame = m_currentFrame;
+
+}
+
+// Configures model, view, and projection matrices based on camera data
+void Renderer::configureRenderMatrices() {
+
+    // model, view, and projection matrices //
+    m_Model = glm::mat4(1.0f);
+    m_View = m_Camera.CalculateViewMatrix();
+    m_Projection = glm::perspective(glm::radians(
+        m_Camera.getZoom()),
+        static_cast<float>(ScreenWidth) / static_cast<float>(ScreenWidth),
+        0.1f, 255.0f
+    );
+}
 
 // initializes GLFW and creates a GLFW window and OpenGL context, initializes GLEW
 bool Renderer::Initialize() {

@@ -1,6 +1,19 @@
 
 #include "Material.h"
 
+Material getDefaultMaterial() {
+
+	Material defaultMat;
+
+	defaultMat.ambient = glm::vec3(0.1f, 0.1f, 0.1f);
+	defaultMat.diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	defaultMat.specular = glm::vec3(0.9f, 0.9f, 0.9f);
+	defaultMat.shininess = 0.5f;
+
+	return defaultMat;
+
+}
+
 Material getMaterialEmerald() {
 
 	Material emeraldMaterial;

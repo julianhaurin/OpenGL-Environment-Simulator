@@ -4,6 +4,7 @@
 // Notes:
 // obj material config path hardcoded to ./assets/textures/ remember this being a bug before but idk if its always necessary
 // allow making models smaller
+// fix default texture
 
 #pragma once
 
@@ -36,11 +37,12 @@ class Model
 public:
 
 	// in_sizeMultiplyer controls size of object (makes it bigger)
+	Model(const std::string in_objFile, const float in_sizeMultiplyer = 1);
 	Model(const std::string in_objFile, const Material in_material, const std::string in_texturePath, const float in_sizeMultiplyer = 1);
 	~Model();
 
-	void Bind();
-	void Render(glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat, glm::vec3 in_ViewPos);
+	void Bind(const bool bindTexture = true);
+	void Render(glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat, glm::vec3 in_ViewPos, glm::mat4 in_LightSpaceMat, const bool useModelShader = true);
 
 
 private:
@@ -67,5 +69,6 @@ private:
 
 	bool loadObjData();
 	void setUpModel();
+	void configureShader(glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat, glm::vec3 in_ViewPos, glm::mat4 in_LightSpaceMat);
 
 };

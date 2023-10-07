@@ -14,5 +14,6 @@ struct Material {
 	float shininess;
 };
 
+Material getDefaultMaterial();
 Material getMaterialEmerald();
 

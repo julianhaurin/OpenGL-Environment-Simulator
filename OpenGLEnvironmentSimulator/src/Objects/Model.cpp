@@ -6,6 +6,26 @@
 
 // Public Methods //
 
+Model::Model(const std::string in_objFile, const float in_sizeMultiplyer)
+	: m_objFilePath(in_objFile),
+	  m_ShaderProgram(ShaderProgram("./shaders/vertexShader.vs", "./shaders/fragmentShader.fs")),
+	  m_VBO(0), m_EBO(0), m_VAO(0), m_vertexPositionMultiplyer(in_sizeMultiplyer),
+	  m_Texture(Texture("./assets/textures/quack.png")), m_Material(getDefaultMaterial())
+{
+	assert(in_sizeMultiplyer >= 0);
+
+	Light light;
+	light.ambient = glm::vec3(0.2f, 0.2f, 0.2f);
+	light.diffuse = glm::vec3(0.6f, 0.6f, 0.6f);
+	light.specular = glm::vec3(1.0f, 1.0f, 1.0f);
+	light.position = glm::vec3(00.0f, 00.0f, 300.0f);
+	m_Light = light;
+
+	loadObjData();
+	setUpModel();
+
+}
+
 Model::Model(const std::string in_objFile, const Material in_material, const std::string in_texturePath, const float in_sizeMultiplyer)
 	: m_objFilePath(in_objFile), 
 	  m_ShaderProgram(ShaderProgram("./shaders/vertexShader.vs", "./shaders/fragmentShader.fs")),
@@ -29,21 +49,40 @@ Model::~Model() {
 
 }
 
-void Model::Bind() {
+void Model::Bind(const bool bindTexture) {
 
 	glBindVertexArray(m_VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
-	m_Texture.Bind();
+	if (bindTexture) m_Texture.Bind();
 
 }
 
-void Model::Render(glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat, glm::vec3 in_ViewPos) {
+void Model::Render(glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat, glm::vec3 in_ViewPos, glm::mat4 in_LightSpaceMat, const bool useModelShader) {
+
+	// switches between rendering model normally and rendering model for shadow map
+	if (useModelShader) { // render normally
+		configureShader(in_ModelMat, in_ViewMat, in_ProjeMat, in_ViewPos, in_LightSpaceMat);
+		Bind();
+	}
+	else { // render for shadow map
+		Bind(false);
+	}
+
+	glDrawArrays(GL_TRIANGLES, 0, m_VertexData.size() / 3);
+	//glDrawElements(GL_TRIANGLES, m_IndexData.size() * 3, GL_UNSIGNED_INT, 0);
+}
+
+// Private Methods //
+
+void Model::configureShader(glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat, glm::vec3 in_ViewPos, glm::mat4 in_LightSpaceMat) {
 
 	m_ShaderProgram.UseProgram();
 	m_ShaderProgram.SetMat4("u_Model", in_ModelMat);
 	m_ShaderProgram.SetMat4("u_View", in_ViewMat);
 	m_ShaderProgram.SetMat4("u_Projection", in_ProjeMat);
+
+	m_ShaderProgram.SetMat4("u_LightSpaceMatrix", in_LightSpaceMat);
 
 	m_ShaderProgram.SetVec3("u_ObjectColor", glm::vec3(0.1f, 0.9f, 0.2f));
 
@@ -63,12 +102,7 @@ void Model::Render(glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_Pro
 	m_ShaderProgram.SetVec3("u_Material.specular", m_Material.specular);
 	m_ShaderProgram.SetFloat("u_Material.ambient", m_Material.shininess);
 
-	Bind();
-	glDrawArrays(GL_TRIANGLES, 0, m_VertexData.size() / 3);
-	//glDrawElements(GL_TRIANGLES, m_IndexData.size() * 3, GL_UNSIGNED_INT, 0);
 }
-
-// Private Methods //
 
 bool Model::loadObjData() {
 
@@ -183,3 +217,4 @@ void Model::setUpModel() {
 	//unsigned int diffuseMap = loadTexture("../assets/textures/containerDiffuseMap.png");
 
 }
+
