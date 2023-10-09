@@ -1,9 +1,8 @@
 
-
 #include "CubeModel.h"
 
 // represents the data of a cube 
-std::vector<float> cubeVertices2 = {
+const std::vector<float> CubeModel::cubeVertices = {
     // positions          // normals           // texture coords
     -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
      0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f,
@@ -47,3 +46,4 @@ std::vector<float> cubeVertices2 = {
     -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
     -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f
 };
+

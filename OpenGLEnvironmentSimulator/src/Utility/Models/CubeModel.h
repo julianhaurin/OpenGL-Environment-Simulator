@@ -4,4 +4,9 @@
 #include <vector>
 
 // represents the data of a cube 
-//std::vector<float> cubeVertices;
+class CubeModel
+{
+public:
+	static const std::vector<float> cubeVertices;
+
+};

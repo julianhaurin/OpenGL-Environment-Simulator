@@ -6,6 +6,7 @@
 // obj material config path hardcoded to ./assets/textures/ remember this being a bug before but idk if its always necessary
 // allow making models smaller
 // fix default texture ***
+// abstract further to include light emitting sources or other custom objects (?)
 
 #pragma once
 
@@ -30,8 +31,13 @@ class Model
 public:
 
 	// in_sizeMultiplyer controls size of object
-	Model(const std::string in_objFile, const float in_sizeMultiplyer = 1);
-	Model(const std::string in_objFile, const Material in_material, const std::string in_texturePath, const float in_sizeMultiplyer = 1);
+	Model(const std::string in_objFile, const LightData in_lightSourceData, const float in_sizeMultiplyer = 1);
+	Model(const std::string in_objFile,
+		const LightData in_lightSourceData,
+		const Material in_material,
+		const std::string in_texturePath,
+		const float in_sizeMultiplyer = 1
+	);
 	~Model();
 
 	// binds objects and all OpenGL objects within class
@@ -63,10 +69,10 @@ private:
 	std::vector<tinyobj::index_t> m_IndexData; // EBO data
 
 	// model objects
-	Texture m_Texture;
+	LightData m_Light;
 	Material m_Material;
-	Light m_Light;
-
+	Texture m_Texture;
+	
 	// Methods //
 
 	bool loadObjData(); // loads data from .obj file path into m_VertexData and m_IndexData (tinyobjloader)

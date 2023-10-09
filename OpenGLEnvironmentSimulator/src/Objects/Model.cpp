@@ -6,13 +6,13 @@
 
 // Public Methods //
 
-Model::Model(const std::string in_objFile, const float in_sizeMultiplyer)
+Model::Model(const std::string in_objFile, const LightData in_lightSourceData, const float in_sizeMultiplyer)
 	: m_objFilePath(in_objFile), m_vertexPositionMultiplyer(in_sizeMultiplyer),
 	  m_ShaderProgram(ShaderProgram("./shaders/vertexShader.vs", "./shaders/fragmentShader.fs")),
 	  m_VBO(0), m_EBO(0), m_VAO(0), 
-	  m_Texture(Texture("./assets/textures/quack.png")), 
+	  m_Light(in_lightSourceData),
 	  m_Material(getDefaultMaterial()),
-	  m_Light(getDefaultLight())
+	  m_Texture(Texture("./assets/textures/quack.png"))
 {
 	assert(m_vertexPositionMultiplyer >= 0);
 
@@ -21,13 +21,19 @@ Model::Model(const std::string in_objFile, const float in_sizeMultiplyer)
 
 }
 
-Model::Model(const std::string in_objFile, const Material in_material, const std::string in_texturePath, const float in_sizeMultiplyer)
+Model::Model(
+	const std::string in_objFile, 
+	const LightData in_lightSourceData, 
+	const Material in_material, 
+	const std::string in_texturePath, 
+	const float in_sizeMultiplyer
+)
 	: m_objFilePath(in_objFile), m_vertexPositionMultiplyer(in_sizeMultiplyer),
 	  m_ShaderProgram(ShaderProgram("./shaders/vertexShader.vs", "./shaders/fragmentShader.fs")),
 	  m_VBO(0), m_EBO(0), m_VAO(0), 
-	  m_Texture(in_texturePath), 
-	  m_Material(in_material),
-	  m_Light(getDefaultLight())
+	  m_Light(in_lightSourceData),
+	  m_Material(getDefaultMaterial()),
+	  m_Texture(Texture("./assets/textures/quack.png"))
 {
 	assert(in_sizeMultiplyer >= 0);
 
@@ -50,6 +56,8 @@ void Model::Bind(const bool bindTexture) {
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
 	if (bindTexture) m_Texture.Bind();
+
+	m_ShaderProgram.UseProgram();
 
 }
 

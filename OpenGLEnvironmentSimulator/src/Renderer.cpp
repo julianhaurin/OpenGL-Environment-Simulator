@@ -22,16 +22,22 @@ Renderer::Renderer()
     }
     std::cout << "[J] - Renderer successfully initialized! \n\n";
 
-    // add scene models
-    std::shared_ptr<Model> duckModel
-        = std::make_shared<Model>("./assets/quack.obj", getMaterialEmerald(), "./assets/textures/quack.png", 0.5f);
+    // Scene light source //
+    m_Light = std::make_shared<Light>();
+
+    // Scene models //
+    std::shared_ptr<Model> duckModel =
+        std::make_shared<Model>(
+            "./assets/quack.obj", m_Light->getLightData(), getMaterialEmerald(), "./assets/textures/quack.png", 0.5f
+        );
+
     addModel(duckModel);
 
     //std::shared_ptr<Model> floor
     //    = std::make_shared<Model>("./assets/floor.obj", 3);
     //addModel(floor);
 
-    // custom objects
+    // Custom objects //
     m_ShadowMap = std::make_shared<ShadowMap>(1024, 1024); // resolution 1024 X 1024
     m_Ocean = std::make_shared<Ocean>(64, 0.00025f, glm::vec2(1.0f, 10.0f), 64);
     //m_SkyBox = std::make_shared<SkyBox>("./assets/skyBox/sunnySky/");
@@ -52,7 +58,7 @@ void Renderer::addModel(std::shared_ptr<Model> in_model_p) {
 // render loop
 void Renderer::Run() {
 
-    glm::vec3 lightPos(100.0f, 300.0f, 200.0f);
+    LightData lightSourceData = m_Light->getLightData();
 
     std::cout << "[J] - Beginning render loop... \n";
     while (glfwWindowShouldClose(m_Window) == false)
@@ -62,32 +68,18 @@ void Renderer::Run() {
         processKeyboardInputs();
         configureRenderMatrices();
 
-        // Render scene to depth map // 
-        /*
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        m_ShadowMap->PrepareRendering(); // sets up shadow map rendering
-
-        // render all objects in objects list
-        for (int i = 0; i < m_RenderObjects.size(); i++) {
-            m_RenderObjects[i]->Render(m_Model, m_View, m_Projection, m_Camera.getWorldPos(), m_ShadowMap->getLightSpaceMatrix(), false);
-
-        }
-        */
-        // ************************* //
-
-        // Render scene with shadow mapping (using depth map) //
         glViewport(0, 0, ScreenWidth, ScreenWidth); // sets viewport for this framebuffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f); // background color
 
-        m_Ocean->Render(m_currentFrame, m_Model, m_View, m_Projection, lightPos, m_Camera.getWorldPos());
+        // Render scene ************************************ //
+        m_Light->Render(m_Model, m_View, m_Projection);
+        m_Ocean->Render(m_currentFrame, m_Model, m_View, m_Projection, lightSourceData.position, m_Camera.getWorldPos());
         
         // iterate through render objects - is this best practice?
         for (int i = 0; i < m_RenderObjects.size(); i++) {
             m_RenderObjects[i]->Render(m_Model, m_View, m_Projection, m_Camera.getWorldPos(), m_ShadowMap->getLightSpaceMatrix());
-
         }
-
 
         glfwSwapBuffers(m_Window);
         glfwPollEvents();

@@ -27,9 +27,9 @@
 #include "ShadowMapping/ShadowMap.h"
 #include "SkyBox/SkyBox.h"
 
+#include "Objects/Light.h"
 #include "Objects/Model.h"
 #include "Objects/Material.h"
-#include "Objects/Light.h"
 
 #include "Utility/utility.h"
 
@@ -50,6 +50,9 @@ public:
 private:
     GLFWwindow* m_Window; // OpenGL window abstraction
 	Camera m_Camera; // camera abstraction
+
+	// light source of scene
+	std::shared_ptr<Light> m_Light;
 
 	// list of render objects
 	std::vector<std::shared_ptr<Model>> m_RenderObjects;
