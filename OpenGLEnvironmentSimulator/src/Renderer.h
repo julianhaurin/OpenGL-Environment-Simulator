@@ -1,15 +1,14 @@
 
-#pragma once
-
 // Notes:
-// lots of optimizing and updating to do
 // research batch rendering techniques and
-// industry standard for rendering list of objects (model class)
+// standard for rendering multiple objects
+// youtube.com/watch?v=Th4huqR77rI
 //
 // glfw callback function workaround 
 // stackoverflow.com/questions/7676971/pointing-to-a-function-that-is-a-class-member-glfw-setkeycallback
 // 
-// init vbos n shit to 0
+
+#pragma once
 
 #include <iostream>
 #include <cstdint>
@@ -26,8 +25,8 @@
 
 #include "Ocean/Ocean.h"
 #include "ShadowMapping/ShadowMap.h"
+#include "SkyBox/SkyBox.h"
 
-#include "Objects/SkyBox.h"
 #include "Objects/Model.h"
 #include "Objects/Material.h"
 #include "Objects/Light.h"
@@ -44,50 +43,53 @@ public:
 
 	Renderer();
 	~Renderer();
-
-	// render loop
-	void addModel(std::shared_ptr<Model> in_model_p);
-	void Run();
+	
+	void Run(); // initiates render loop
+	void addModel(std::shared_ptr<Model> in_model_p); // to m_RenderObjects
 
 private:
-    GLFWwindow* m_Window;
-	Camera m_Camera;
-
-	std::shared_ptr<ShadowMap> m_ShadowMap; // Shadow map object
-	std::shared_ptr<Ocean> m_Ocean; // Ocean object
+    GLFWwindow* m_Window; // OpenGL window abstraction
+	Camera m_Camera; // camera abstraction
 
 	// list of render objects
 	std::vector<std::shared_ptr<Model>> m_RenderObjects;
 
-    float m_lastY;
-    float m_lastX;
+	// custom objects //
+	std::shared_ptr<ShadowMap> m_ShadowMap; // Shadow map object
+	std::shared_ptr<Ocean> m_Ocean; // Ocean object
 
-	float m_lastFrame;
-	float m_currentFrame;
-	float m_deltaTime;
-	
-	float m_frameCount;
-
+	// rendering matrices //
 	glm::mat4 m_Model;
 	glm::mat4 m_View;
 	glm::mat4 m_Projection;
 
-	// initializes GLFW and creates a GLFW window and OpenGL context, initializes GLEW
-	bool Initialize();
-	// Initiliazes GLFW and returns a pointer to the current GLFW window
-	GLFWwindow* setupGLFWWindow(const uint32_t screenWidth, const uint32_t screenHeight);
+	// frame and timing data //
+	float m_lastY;
+	float m_lastX;
 
-    void processKeyboardInputs(); // process keyboard inputs
+	float m_lastFrame;
+	float m_currentFrame;
+	float m_deltaTime;
+
+	float m_frameCount;
+
+	// Methods //
+
+	void processKeyboardInputs(); // process keyboard inputs
 
 	void configureFrameTimes(); // configures deltaTime, lastFrame, and currentFrame
 	void configureRenderMatrices(); // configures model, view, and projection matrices
 
-	// deallocates glfw resources
-	void glfwCleanUp(GLFWwindow* window);
+	// initializes GLFW and creates a GLFW window and OpenGL context, initializes GLEW
+	bool Initialize();
 
+	// Initiliazes GLFW and returns a pointer to the current GLFW window
+	GLFWwindow* setupGLFWWindow(const uint32_t screenWidth, const uint32_t screenHeight);
+	void glfwCleanUp(GLFWwindow* window); // deallocates glfw resources
+	 
 };
 
-//// GLFW callback functions //
+// GLFW callback functions //
 //void glfwMouseCallback(double in_xPos, double in_yPos);
 //void glfwScrollCallback(double xoffset, double yoffset);
 

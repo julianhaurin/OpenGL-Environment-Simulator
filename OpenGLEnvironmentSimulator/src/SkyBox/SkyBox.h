@@ -10,8 +10,7 @@
 #include <GL/glew.h>
 
 #include "../ShaderHandlers/ShaderProgram.h"
-#include "Texture.h"
-//#include "stb_image.h"
+#include "../Objects/Texture.h"
 
 class SkyBox
 {

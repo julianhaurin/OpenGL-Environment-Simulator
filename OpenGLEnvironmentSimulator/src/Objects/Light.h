@@ -11,3 +11,6 @@ struct Light {
 	glm::vec3 diffuse;
 	glm::vec3 specular;
 };
+
+// returns light object with basic default values
+Light getDefaultLight();

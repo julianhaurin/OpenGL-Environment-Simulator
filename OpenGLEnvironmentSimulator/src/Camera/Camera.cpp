@@ -1,9 +1,13 @@
 
 #include "Camera.h"
 
+// Static member variables //
+
 const float Camera::initSpeed = 25.0f;
 const float Camera::initMouseSensitivity = 25.0f;
 const float Camera::initZoom = 45.0f;
+
+// Public Methods //
 
 Camera::Camera(glm::vec3 position, glm::vec3 worldUp, float yaw, float pitch)
 	: m_Position(position), m_WorldUp(worldUp),
@@ -13,12 +17,14 @@ Camera::Camera(glm::vec3 position, glm::vec3 worldUp, float yaw, float pitch)
 	  m_Yaw(yaw), m_Pitch(pitch),
 	  m_Speed(initSpeed), m_MouseSensitivity(initMouseSensitivity), m_Zoom(initZoom)
 {
-	updateCameraVectors();
+	updateCameraVectors(); // recalculate camera vectors
 }
 
+// moves camera based on keyboard inputs
 void Camera::ProcessKeyboardInput(const CameraMovement in_Direction, const float deltaTime) {
 	const float velocity = m_Speed * deltaTime;
 
+	// WASD movements
 	if (in_Direction == Forwards)
 		m_Position += m_Front * velocity;
 	else if (in_Direction == Backwards)
@@ -28,11 +34,13 @@ void Camera::ProcessKeyboardInput(const CameraMovement in_Direction, const float
 	else if (in_Direction == Right)
 		m_Position += m_Right * velocity;
 
+	// SPACE and SHIFT
 	if (in_Direction == Up)
 		m_Position += m_Up * velocity;
 	if (in_Direction == Down)
 		m_Position -= m_Up * velocity;
 
+	// ARROW KEYS
 	if (in_Direction == YawLeft)
 		m_Yaw -= velocity;
 	else if (in_Direction == YawRight)
@@ -48,10 +56,11 @@ void Camera::ProcessKeyboardInput(const CameraMovement in_Direction, const float
 	if (m_Pitch < -89.9f)
 		m_Pitch = -89.9f;
 
-	updateCameraVectors();
+	updateCameraVectors(); // recalculate positional vectors
 
 }
 
+// moves camera based on mouse movements (glfw mouse disabled for now - 10/7)
 void Camera::ProcessMouseInput(const float in_xOffset, const float in_yOffset, const bool in_ConstrainPitch) {
 	
 	m_Yaw += in_xOffset * m_MouseSensitivity;
@@ -67,6 +76,7 @@ void Camera::ProcessMouseInput(const float in_xOffset, const float in_yOffset, c
 	updateCameraVectors();
 }
 
+// changes camera zoom (glfw mouse scroll disabled for now - 10/7)
 void Camera::ProcessMouseScroll(float in_yOffset) {
 	m_Zoom -= in_yOffset;
 	if (m_Zoom < 1.0f)
@@ -75,18 +85,12 @@ void Camera::ProcessMouseScroll(float in_yOffset) {
 		m_Zoom = 45.0f;
 }
 
+// returns the camera lookAt matrix
 glm::mat4 Camera::CalculateViewMatrix() const {
 	return glm::lookAt(m_Position, m_Position + m_Front, m_Up);
 }
 
-float Camera::getZoom() const { 
-	return m_Zoom;
-
-}
-
-glm::vec3 Camera::getWorldPos() const {
-	return m_Position;
-}
+// Private methods //
 
 // recalculates camera member variables when needed
 void Camera::updateCameraVectors() {

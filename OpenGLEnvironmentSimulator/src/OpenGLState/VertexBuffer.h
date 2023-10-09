@@ -1,5 +1,7 @@
 
-// Class Abstraction for OpenGL Vertex Buffer Object (VBO) - 9/10/23
+// Class Abstraction for OpenGL Vertex Buffer Object (VBO) 
+// *** IN-PROGRESS ***
+
 
 // Notes:
 // is GLfloat / GLuint etc. best practice? 

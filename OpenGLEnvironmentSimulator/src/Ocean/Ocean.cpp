@@ -12,6 +12,15 @@
 // mPrime and nPrime are now values within range [0, M] and [0, N] respectively, 
 // and are converted to proper ranges within functions when necessary
 
+// Notes:
+// lots of printing good for debugging - remove in release version
+// add override keyword bum
+// research better error handling practices? printOpenGLErrors() more
+// fix order of member init lists EVERYWHERE, make everything const
+// std::cerr instead of std::cout?
+// organize shader folder
+// refactor shadow class and model rendering function
+
 // add more comments
 // change pi
 
@@ -114,8 +123,8 @@ void Ocean::Initialize() {
 
 	// Initialize vertex and fragment shader program
 	m_OceanShaderProgram.UseProgram();
-	m_PositionAttrib = glGetAttribLocation(m_OceanShaderProgram.getID(), "inV_Pos");
-	m_NormalAttrib = glGetAttribLocation(m_OceanShaderProgram.getID(), "inV_Norm");
+	m_PositionAttrib = glGetAttribLocation(m_OceanShaderProgram.getProgramID(), "inV_Pos");
+	m_NormalAttrib = glGetAttribLocation(m_OceanShaderProgram.getProgramID(), "inV_Norm");
 
 	// generate and bind grid VBO, VAO, and EBO - eventually extrapolate to VBO/EBO classes
 	glGenBuffers(1, &m_GridVBO);
@@ -133,7 +142,7 @@ void Ocean::Initialize() {
 	glEnableVertexAttribArray(m_PositionAttrib);
 	glVertexAttribPointer(m_PositionAttrib, 3, GL_FLOAT, GL_FALSE, sizeof(OceanVertex), (GLvoid*)0);
 
-	GLintptr vertexPositionOffset = 6 * sizeof(GLfloat);
+	GLintptr vertexPositionOffset = 8 * sizeof(GLfloat);
 	glEnableVertexAttribArray(m_NormalAttrib);
 	glVertexAttribPointer(m_NormalAttrib, 3, GL_FLOAT, GL_FALSE, sizeof(OceanVertex), (GLvoid*)vertexPositionOffset);
 
@@ -201,10 +210,9 @@ void Ocean::Render(const float time, glm::mat4 in_ModelMat, glm::mat4 in_ViewMat
 void Ocean::DeallocateResources() {
 
 	// was breaking my whole program bruh
-	// 
-	//glDeleteVertexArrays(1, &m_GridVBO);
-	//glDeleteBuffers(1, &m_GridVAO);
-	//glDeleteBuffers(1, &m_GridEBO);
+	glDeleteVertexArrays(1, &m_GridVBO);
+	glDeleteBuffers(1, &m_GridVAO);
+	glDeleteBuffers(1, &m_GridEBO);
 
 }
 

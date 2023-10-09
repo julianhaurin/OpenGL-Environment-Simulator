@@ -1,5 +1,6 @@
 
-// Class Abstraction for OpenGL Element Buffer Object (EBO) - 9/10/23
+// Class Abstraction for OpenGL Element Buffer Object (EBO)
+// *** IN-PROGRESS ***
 
 // Notes:
 // notes from VertexBuffer.h

@@ -1,7 +1,9 @@
 
+// Class abstraction for shader program that accepts vertex and fragment shaders
+
 #pragma once
 
-#include "Shader.h"
+#include "Shader.h" // parent class
 
 #include <iostream>
 #include <string>
@@ -9,7 +11,6 @@
 #include <sstream>
 #include <fstream>
 
-#define GLEW_STATIC
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
@@ -19,8 +20,8 @@
 class ShaderProgram : public Shader
 {
 public: 
+	// accepts paths to vertex and fragment shaders
 	ShaderProgram(const char* in_vertexShaderPath, const char* in_fragmentShaderPath);
-	GLint getID();
 
 private:
 

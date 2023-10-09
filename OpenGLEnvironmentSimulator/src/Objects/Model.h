@@ -1,10 +1,11 @@
 
-// Represents an renderable object with a single VBO, EBO, and VAO
+// Represents an renderable object with a VBO, EBO, and VAO
+// loads data from .obj file
 
 // Notes:
 // obj material config path hardcoded to ./assets/textures/ remember this being a bug before but idk if its always necessary
 // allow making models smaller
-// fix default texture
+// fix default texture ***
 
 #pragma once
 
@@ -17,39 +18,42 @@
 
 #include <tinyobj/tiny_obj_loader.h>	
 
+#include "../Utility/utility.h"
 #include "../ShaderHandlers/ShaderProgram.h"
+
 #include "Material.h"
 #include "Texture.h"
 #include "Light.h"
-#include "../Utility/utility.h"
-
-//#include "../Utility/Models/CubeModel.h"
-
-// represents data of one vertex
-//struct VertexData {
-//	glm::vec3 pos; // xyz position of vertex
-//	glm::vec3 norm; // direction of normal vector
-//	//glm::vec3 texCoord; // texture coordinate
-//};
 
 class Model
 {
 public:
 
-	// in_sizeMultiplyer controls size of object (makes it bigger)
+	// in_sizeMultiplyer controls size of object
 	Model(const std::string in_objFile, const float in_sizeMultiplyer = 1);
 	Model(const std::string in_objFile, const Material in_material, const std::string in_texturePath, const float in_sizeMultiplyer = 1);
 	~Model();
 
+	// binds objects and all OpenGL objects within class
 	void Bind(const bool bindTexture = true);
-	void Render(glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat, glm::vec3 in_ViewPos, glm::mat4 in_LightSpaceMat, const bool useModelShader = true);
+
+	// renders object (called each loop)
+	void Render(
+		glm::mat4 in_ModelMat, 
+		glm::mat4 in_ViewMat, 
+		glm::mat4 in_ProjeMat, 
+		glm::vec3 in_ViewPos, 
+		glm::mat4 in_LightSpaceMat, 
+		const bool useModelShader = true
+	);
 
 
 private:
 
-	const std::string m_objFilePath;
+	const std::string m_objFilePath; // path to .obj file
+	const float m_vertexPositionMultiplyer;
 
-	ShaderProgram m_ShaderProgram;
+	ShaderProgram m_ShaderProgram; // shader program of object
 
 	GLuint m_VBO;
 	GLuint m_EBO;
@@ -58,17 +62,15 @@ private:
 	std::vector<tinyobj::real_t> m_VertexData; // EBO data
 	std::vector<tinyobj::index_t> m_IndexData; // EBO data
 
+	// model objects
 	Texture m_Texture;
-	const Material m_Material;
-	const float m_vertexPositionMultiplyer;
-
+	Material m_Material;
 	Light m_Light;
 
-	std::vector<float> m_cubeVertices;
-	uint32_t m_diffuseMap;
+	// Methods //
 
-	bool loadObjData();
-	void setUpModel();
+	bool loadObjData(); // loads data from .obj file path into m_VertexData and m_IndexData (tinyobjloader)
+	void setUpModel(); // initializes VBO, EBO, and VAO objects
 	void configureShader(glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat, glm::vec3 in_ViewPos, glm::mat4 in_LightSpaceMat);
 
 };

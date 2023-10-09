@@ -6,8 +6,8 @@
 ComputeShader::ComputeShader(const char* in_compShaderPath) 
 	: m_compShaderCode("")
 {
-	retrieveShaderSourceCode(in_compShaderPath);
-	InitializeShaders();
+	retrieveShaderSourceCode(in_compShaderPath); // get source code from provided file
+	InitializeShaders(); // setup and initialize compute shader
 
 }
 
@@ -20,21 +20,15 @@ void ComputeShader::InitializeShaders() {
 	glCompileShader(computeID);
 
 	if (checkCompilationSuccess(computeID, "compute") == true) {
-		std::cout << "[J] Shader program (ID: " << m_ID << ") successfully compiled compute shader! \n";
+		std::cout << "[J] Shader program (ID: " << computeID << ") successfully compiled compute shader! \n";
 	}
-
-	//GLint success;
-	//glGetShaderiv(m_ID, GL_COMPILE_STATUS, &success);
 	
 	m_ID = glCreateProgram();
 	glAttachShader(m_ID, computeID);
 	glLinkProgram(m_ID);
 
-	// *** Todo: check linking success
-
 	std::cout << std::endl;
 	
-
 }
 
 // reads source code from provided file and updates member variable
@@ -53,8 +47,8 @@ void ComputeShader::retrieveShaderSourceCode(const char* in_compShaderPath) {
 
 	}
 	catch (std::ifstream::failure& err) {
-		std::cout << "[J] - ERROR: Compute shader (ID: " << m_ID 
-			<< ") failed to successfully read provided file: " << err.what() << std::endl;
+		std::cout << "[J] - ERROR: Compute shader failed to successfully read provided file: " << 
+			err.what() << std::endl;
 	}
 
 }

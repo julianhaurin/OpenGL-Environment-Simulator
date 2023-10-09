@@ -7,19 +7,14 @@
 // Public Methods //
 
 Model::Model(const std::string in_objFile, const float in_sizeMultiplyer)
-	: m_objFilePath(in_objFile),
+	: m_objFilePath(in_objFile), m_vertexPositionMultiplyer(in_sizeMultiplyer),
 	  m_ShaderProgram(ShaderProgram("./shaders/vertexShader.vs", "./shaders/fragmentShader.fs")),
-	  m_VBO(0), m_EBO(0), m_VAO(0), m_vertexPositionMultiplyer(in_sizeMultiplyer),
-	  m_Texture(Texture("./assets/textures/quack.png")), m_Material(getDefaultMaterial())
+	  m_VBO(0), m_EBO(0), m_VAO(0), 
+	  m_Texture(Texture("./assets/textures/quack.png")), 
+	  m_Material(getDefaultMaterial()),
+	  m_Light(getDefaultLight())
 {
-	assert(in_sizeMultiplyer >= 0);
-
-	Light light;
-	light.ambient = glm::vec3(0.2f, 0.2f, 0.2f);
-	light.diffuse = glm::vec3(0.6f, 0.6f, 0.6f);
-	light.specular = glm::vec3(1.0f, 1.0f, 1.0f);
-	light.position = glm::vec3(00.0f, 00.0f, 300.0f);
-	m_Light = light;
+	assert(m_vertexPositionMultiplyer >= 0);
 
 	loadObjData();
 	setUpModel();
@@ -27,26 +22,25 @@ Model::Model(const std::string in_objFile, const float in_sizeMultiplyer)
 }
 
 Model::Model(const std::string in_objFile, const Material in_material, const std::string in_texturePath, const float in_sizeMultiplyer)
-	: m_objFilePath(in_objFile), 
+	: m_objFilePath(in_objFile), m_vertexPositionMultiplyer(in_sizeMultiplyer),
 	  m_ShaderProgram(ShaderProgram("./shaders/vertexShader.vs", "./shaders/fragmentShader.fs")),
-	  m_VBO(0), m_EBO(0), m_VAO(0), m_vertexPositionMultiplyer(in_sizeMultiplyer),
-	  m_Texture(in_texturePath), m_Material(in_material)
+	  m_VBO(0), m_EBO(0), m_VAO(0), 
+	  m_Texture(in_texturePath), 
+	  m_Material(in_material),
+	  m_Light(getDefaultLight())
 {
 	assert(in_sizeMultiplyer >= 0);
-
-	Light light;
-	light.ambient = glm::vec3(0.2f, 0.2f, 0.2f);
-	light.diffuse = glm::vec3(0.6f, 0.6f, 0.6f);
-	light.specular = glm::vec3(1.0f, 1.0f, 1.0f);
-	light.position = glm::vec3(00.0f, 00.0f, 300.0f);
-	m_Light = light;
 
 	loadObjData();
 	setUpModel();
 }
 
+// deallocate OpenGL resources
 Model::~Model() {
 
+	glDeleteVertexArrays(1, &m_VBO);
+	glDeleteBuffers(1, &m_VAO);
+	glDeleteBuffers(1, &m_EBO);
 }
 
 void Model::Bind(const bool bindTexture) {
@@ -104,15 +98,14 @@ void Model::configureShader(glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::ma
 
 }
 
+// loads data into m_Vertices and m_Indices using tinyobjloader
 bool Model::loadObjData() {
 
 	tinyobj::ObjReader objReader;
-
 	tinyobj::ObjReaderConfig objReaderConfig;
 	objReaderConfig.mtl_search_path = "./assets/textures/";
 
-	// reads file data
-	bool readStatus = objReader.ParseFromFile(m_objFilePath, objReaderConfig);
+	bool readStatus = objReader.ParseFromFile(m_objFilePath, objReaderConfig); // reads file data
 
 	// handles error messages
 	if (readStatus == false) {
@@ -150,7 +143,6 @@ bool Model::loadObjData() {
 				tinyobj::index_t index = shapes[shapeIdx].mesh.indices[idxOffset + vertIdx];
 
 				// VBO data //
-
 				// vertex position
 				m_VertexData.push_back(attrib.vertices[3 * (size_t)index.vertex_index] * m_vertexPositionMultiplyer); // + 0
 				m_VertexData.push_back(attrib.vertices[3 * (size_t)index.vertex_index + 1] * m_vertexPositionMultiplyer);
@@ -174,14 +166,12 @@ bool Model::loadObjData() {
 			}
 
 			idxOffset += faceVertices;
-
 			//shapes[shapeIdx].mesh.material_ids[faceIdx];
 
 		}
 	}
 
 	std::cout << "[J] - Successfully loaded model obj data! \n";
-
 	return true;
 
 }

@@ -9,7 +9,6 @@ uniform mat4 u_View;
 uniform mat4 u_Projection;
 uniform vec3 u_LightPos;
 
-
 out vec3 inF_Normal;
 out vec3 inF_LightDir;
 out vec3 inF_HalfwayVector; // idk
@@ -24,7 +23,7 @@ void main()
 
 	// Calculate Out Values //
 	vec3 unitNorm = normalize(inV_Norm);
-	inF_Normal = (inverse(transpose(u_View * u_Model)) * vec4(unitNorm, 0.0)).xyz;
+	inF_Normal = unitNorm; // (inverse(transpose(u_View * u_Model)) * vec4(unitNorm, 0.0)).xyz;
 	
 	vec4 viewHelper = u_View * u_Model * vec4(inV_Pos, 1.0);
 	inF_LightDir = normalize((u_View * vec4(u_LightPos, 1.0)).xyz - viewHelper.xyz);

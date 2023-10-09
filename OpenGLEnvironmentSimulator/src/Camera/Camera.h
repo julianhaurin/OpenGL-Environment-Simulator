@@ -38,24 +38,30 @@ public:
 	void ProcessMouseScroll(const float in_yOffset);
 
 	glm::mat4 CalculateViewMatrix() const;
-	float getZoom() const;
-	glm::vec3 getWorldPos() const;
+
+	// getters
+	inline float getZoom() const { return m_Zoom; }
+	inline glm::vec3 getWorldPos() const { return m_Position; }
 
 private:
 
-	glm::vec3 m_Position;
+	// positional vectors //
+	glm::vec3 m_Position; // world position
 	glm::vec3 m_WorldUp;
 
 	glm::vec3 m_Right;
 	glm::vec3 m_Up;
 	glm::vec3 m_Front;
 
+	// movement variables //
 	float m_Yaw;
 	float m_Pitch;
 
-	float m_Speed;
+	float m_Speed; // movement speed
 	float m_MouseSensitivity;
 	float m_Zoom;
 
+	// recalculates positional vectors
 	void updateCameraVectors();
+
 };
