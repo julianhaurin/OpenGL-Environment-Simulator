@@ -43,6 +43,7 @@ Model::~Model() {
 	glDeleteBuffers(1, &m_EBO);
 }
 
+// binds OpenGL objects
 void Model::Bind(const bool bindTexture) {
 
 	glBindVertexArray(m_VAO);
@@ -54,49 +55,14 @@ void Model::Bind(const bool bindTexture) {
 
 void Model::Render(glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat, glm::vec3 in_ViewPos, glm::mat4 in_LightSpaceMat, const bool useModelShader) {
 
-	// switches between rendering model normally and rendering model for shadow map
-	if (useModelShader) { // render normally
-		configureShader(in_ModelMat, in_ViewMat, in_ProjeMat, in_ViewPos, in_LightSpaceMat);
-		Bind();
-	}
-	else { // render for shadow map
-		Bind(false);
-	}
-
+	configureShader(in_ModelMat, in_ViewMat, in_ProjeMat, in_ViewPos, in_LightSpaceMat);
+	Bind();
 	glDrawArrays(GL_TRIANGLES, 0, m_VertexData.size() / 3);
-	//glDrawElements(GL_TRIANGLES, m_IndexData.size() * 3, GL_UNSIGNED_INT, 0);
+	// glDrawElements(GL_TRIANGLES, m_IndexData.size() * 3, GL_UNSIGNED_INT, 0);
+	
 }
 
 // Private Methods //
-
-void Model::configureShader(glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat, glm::vec3 in_ViewPos, glm::mat4 in_LightSpaceMat) {
-
-	m_ShaderProgram.UseProgram();
-	m_ShaderProgram.SetMat4("u_Model", in_ModelMat);
-	m_ShaderProgram.SetMat4("u_View", in_ViewMat);
-	m_ShaderProgram.SetMat4("u_Projection", in_ProjeMat);
-
-	m_ShaderProgram.SetMat4("u_LightSpaceMatrix", in_LightSpaceMat);
-
-	m_ShaderProgram.SetVec3("u_ObjectColor", glm::vec3(0.1f, 0.9f, 0.2f));
-
-	// lighting
-	m_ShaderProgram.SetVec3("u_Light.ambient", m_Light.ambient);
-	m_ShaderProgram.SetVec3("u_Light.diffuse", m_Light.diffuse);
-	m_ShaderProgram.SetVec3("u_Light.specular", m_Light.specular);
-	m_ShaderProgram.SetVec3("u_Light.position", m_Light.position);
-
-	m_ShaderProgram.SetVec3("u_LightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-	//m_ShaderProgram.SetVec3("u_LightPosition", glm::vec3(200.0f, 200.0f, 300.0f));
-	m_ShaderProgram.SetVec3("u_ViewPosition", in_ViewPos);
-
-	// material 
-	m_ShaderProgram.SetVec3("u_Material.ambient", m_Material.ambient);
-	m_ShaderProgram.SetVec3("u_Material.diffuse", m_Material.diffuse);
-	m_ShaderProgram.SetVec3("u_Material.specular", m_Material.specular);
-	m_ShaderProgram.SetFloat("u_Material.ambient", m_Material.shininess);
-
-}
 
 // loads data into m_Vertices and m_Indices using tinyobjloader
 bool Model::loadObjData() {
@@ -185,26 +151,51 @@ void Model::setUpModel() {
 
 	glBindVertexArray(m_VAO);
 
-	// vbo set up
+	// VBO set up //
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(m_cubeVertices[0]) * m_cubeVertices.size(), &m_cubeVertices[0], GL_STATIC_DRAW);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(m_VertexData[0]) * m_VertexData.size(), &m_VertexData[0], GL_STATIC_DRAW);
 
-	// ebo set up
+	// EBO set up //
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_IndexData[0]) * m_IndexData.size(), &m_IndexData[0], GL_STATIC_DRAW);
 
-	// VAO set up
+	// VAO set up //
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(m_VertexData[0]) * 8, (GLvoid*)0);
-
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(m_VertexData[0]) * 8, (GLvoid*)0); // position
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(m_VertexData[0]) * 8, (GLvoid*)(3 * sizeof(m_VertexData[0])));
-
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(m_VertexData[0]) * 8, (GLvoid*)(3 * sizeof(m_VertexData[0]))); // normal
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(m_VertexData[0]) * 8, (GLvoid*)(6 * sizeof(m_VertexData[0])));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(m_VertexData[0]) * 8, (GLvoid*)(6 * sizeof(m_VertexData[0]))); // texture coords
 
-	//unsigned int diffuseMap = loadTexture("../assets/textures/containerDiffuseMap.png");
+}
+
+void Model::configureShader(glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat, glm::vec3 in_ViewPos, glm::mat4 in_LightSpaceMat) {
+
+	m_ShaderProgram.UseProgram();
+
+	// rendering matrices //
+	m_ShaderProgram.SetMat4("u_Model", in_ModelMat);
+	m_ShaderProgram.SetMat4("u_View", in_ViewMat);
+	m_ShaderProgram.SetMat4("u_Projection", in_ProjeMat);
+
+	// material values //
+	m_ShaderProgram.SetVec3("u_Material.ambient", m_Material.ambient);
+	m_ShaderProgram.SetVec3("u_Material.diffuse", m_Material.diffuse);
+	m_ShaderProgram.SetVec3("u_Material.specular", m_Material.specular);
+	m_ShaderProgram.SetFloat("u_Material.ambient", m_Material.shininess);
+
+	// lighting //
+	m_ShaderProgram.SetVec3("u_Light.ambient", m_Light.ambient);
+	m_ShaderProgram.SetVec3("u_Light.diffuse", m_Light.diffuse);
+	m_ShaderProgram.SetVec3("u_Light.specular", m_Light.specular);
+	m_ShaderProgram.SetVec3("u_Light.position", m_Light.position);
+
+	// other (fix) //
+	m_ShaderProgram.SetMat4("u_LightSpaceMatrix", in_LightSpaceMat);
+	m_ShaderProgram.SetVec3("u_ObjectColor", glm::vec3(0.1f, 0.9f, 0.2f));
+	m_ShaderProgram.SetVec3("u_LightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+	m_ShaderProgram.SetVec3("u_ViewPosition", in_ViewPos);
+	//m_ShaderProgram.SetVec3("u_LightPosition", glm::vec3(200.0f, 200.0f, 300.0f));
 
 }
 

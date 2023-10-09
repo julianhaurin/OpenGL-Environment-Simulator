@@ -1,4 +1,9 @@
 
+// Represents an image texture and associated OpenGL objects
+
+// Notes:
+// abstract setTexParams() function and allow for custom settings
+
 #pragma once
 
 #include "stb_image.h"
@@ -10,14 +15,12 @@
 
 class Texture
 {
-
 public:
 	Texture(const std::string in_texturePath);
-	void Bind();
-	void setTexParams(); // add params to make chaging settings easier
+	void Bind(); // binds texture objects
 
 private:
-	const std::string m_texturePath;
+	const std::string m_texturePath; // file path to texture image
 
 	GLuint m_textureID;
 
@@ -25,7 +28,8 @@ private:
 	int m_height;
 	int m_nrChannels;
 
-	bool loadAndGenTexture();
+	bool loadAndGenTexture(); // loads texture data and binds to m_textureID
+	void setTexParams(); // add params to make chaging settings easier
 	
 
 };

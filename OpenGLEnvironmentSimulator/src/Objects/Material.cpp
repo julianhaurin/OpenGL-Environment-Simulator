@@ -14,6 +14,7 @@ Material getDefaultMaterial() {
 
 }
 
+// custom emeral material
 Material getMaterialEmerald() {
 
 	Material emeraldMaterial;

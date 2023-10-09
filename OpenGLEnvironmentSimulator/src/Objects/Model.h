@@ -71,6 +71,14 @@ private:
 
 	bool loadObjData(); // loads data from .obj file path into m_VertexData and m_IndexData (tinyobjloader)
 	void setUpModel(); // initializes VBO, EBO, and VAO objects
-	void configureShader(glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat, glm::vec3 in_ViewPos, glm::mat4 in_LightSpaceMat);
+
+	// configures shader data (uniforms)
+	void configureShader(
+		glm::mat4 in_ModelMat, 
+		glm::mat4 in_ViewMat, 
+		glm::mat4 in_ProjeMat, 
+		glm::vec3 in_ViewPos, 
+		glm::mat4 in_LightSpaceMat
+	);
 
 };
