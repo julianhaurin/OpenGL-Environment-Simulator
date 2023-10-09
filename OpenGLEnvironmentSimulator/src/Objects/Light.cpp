@@ -34,8 +34,9 @@ void Light::Bind() {
 
 void Light::Render(glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat) {
 
+	configureShader(in_ModelMat, in_ViewMat, in_ProjeMat);
 	Bind();
-	glDrawArrays(GL_TRIANGLES, 0, m_Vertices.size() / 8);
+	glDrawArrays(GL_TRIANGLES, 0, m_Vertices.size() / 3);
 
 }
 
@@ -72,7 +73,7 @@ void Light::configureShader(glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::ma
 	m_ShaderProgram.UseProgram();
 
 	// rendering matrices //
-	m_ShaderProgram.SetMat4("u_Model", in_ModelMat);
+	m_ShaderProgram.SetMat4("u_Model", glm::translate(in_ModelMat, m_lightData.position));
 	m_ShaderProgram.SetMat4("u_View", in_ViewMat);
 	m_ShaderProgram.SetMat4("u_Projection", in_ProjeMat);
 
@@ -86,7 +87,7 @@ LightData Light::getDefaultLightData() {
 	light.ambient = glm::vec3(0.2f, 0.2f, 0.2f);
 	light.diffuse = glm::vec3(0.6f, 0.6f, 0.6f);
 	light.specular = glm::vec3(1.0f, 1.0f, 1.0f);
-	light.position = glm::vec3(50.0f, 50.0f, 300.0f);
+	light.position = glm::vec3(10.0f, 10.0f, 10.0f);
 
 	return light;
 

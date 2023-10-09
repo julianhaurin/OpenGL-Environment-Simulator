@@ -7,6 +7,7 @@
 // allow making models smaller
 // fix default texture ***
 // abstract further to include light emitting sources or other custom objects (?)
+// size multiplier should be translated thru model matrix
 
 #pragma once
 

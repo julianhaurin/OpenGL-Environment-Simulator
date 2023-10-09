@@ -7,6 +7,7 @@
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "../ShaderHandlers/ShaderProgram.h"
 #include "../Utility/Models/CubeModel.h"
@@ -19,7 +20,12 @@ struct LightData {
 	glm::vec3 specular;
 
 	// constructors
-	LightData() {}
+	LightData() 
+		: position(glm::vec3()),
+		  ambient(glm::vec3()),
+		  diffuse(glm::vec3()),
+		  specular(glm::vec3())
+	{}
 
 	LightData(
 		const glm::vec3 in_position, 

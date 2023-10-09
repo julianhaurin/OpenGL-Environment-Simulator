@@ -27,7 +27,7 @@ Renderer::Renderer()
 
     // Scene models //
     std::shared_ptr<Model> duckModel =
-        std::make_shared<Model>(
+        std::make_shared<Model>(  // source light data, material, texture, size
             "./assets/quack.obj", m_Light->getLightData(), getMaterialEmerald(), "./assets/textures/quack.png", 0.5f
         );
 
