@@ -55,7 +55,7 @@ void Model::Bind(const bool bindTexture) {
 
 void Model::Render(glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat, glm::vec3 in_ViewPos, glm::mat4 in_LightSpaceMat, const bool useModelShader) {
 
-	configureShader(in_ModelMat, in_ViewMat, in_ProjeMat, in_ViewPos, in_LightSpaceMat);
+	configureShader(in_ModelMat, in_ViewMat, in_ProjeMat, in_ViewPos);
 	Bind();
 	glDrawArrays(GL_TRIANGLES, 0, m_VertexData.size() / 3);
 	// glDrawElements(GL_TRIANGLES, m_IndexData.size() * 3, GL_UNSIGNED_INT, 0);
@@ -169,7 +169,7 @@ void Model::setUpModel() {
 
 }
 
-void Model::configureShader(glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat, glm::vec3 in_ViewPos, glm::mat4 in_LightSpaceMat) {
+void Model::configureShader(glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat, glm::vec3 in_ViewPos) {
 
 	m_ShaderProgram.UseProgram();
 
@@ -182,20 +182,18 @@ void Model::configureShader(glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::ma
 	m_ShaderProgram.SetVec3("u_Material.ambient", m_Material.ambient);
 	m_ShaderProgram.SetVec3("u_Material.diffuse", m_Material.diffuse);
 	m_ShaderProgram.SetVec3("u_Material.specular", m_Material.specular);
-	m_ShaderProgram.SetFloat("u_Material.ambient", m_Material.shininess);
+	m_ShaderProgram.SetFloat("u_Material.shininess", m_Material.shininess);
 
 	// lighting //
+	m_ShaderProgram.SetVec3("u_Light.position", m_Light.position);
 	m_ShaderProgram.SetVec3("u_Light.ambient", m_Light.ambient);
 	m_ShaderProgram.SetVec3("u_Light.diffuse", m_Light.diffuse);
 	m_ShaderProgram.SetVec3("u_Light.specular", m_Light.specular);
-	m_ShaderProgram.SetVec3("u_Light.position", m_Light.position);
+	
 
 	// other (fix) //
-	m_ShaderProgram.SetMat4("u_LightSpaceMatrix", in_LightSpaceMat);
-	m_ShaderProgram.SetVec3("u_ObjectColor", glm::vec3(0.1f, 0.9f, 0.2f));
-	m_ShaderProgram.SetVec3("u_LightColor", glm::vec3(1.0f, 1.0f, 1.0f));
 	m_ShaderProgram.SetVec3("u_ViewPosition", in_ViewPos);
-	//m_ShaderProgram.SetVec3("u_LightPosition", glm::vec3(200.0f, 200.0f, 300.0f));
+
 
 }
 

@@ -77,8 +77,7 @@ private:
 		glm::mat4 in_ModelMat, 
 		glm::mat4 in_ViewMat, 
 		glm::mat4 in_ProjeMat, 
-		glm::vec3 in_ViewPos, 
-		glm::mat4 in_LightSpaceMat
+		glm::vec3 in_ViewPos
 	);
 
 };
