@@ -53,6 +53,8 @@ public:
 	void Bind();
 	void Render(glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat); // renders object
 
+	static LightData getDefaultLightData(); // returns LightData object with default values
+
 private:
 
 	LightData m_lightData;
@@ -66,6 +68,6 @@ private:
 
 	void Initialize(); // initializes object data and OpenGL structs
 	void configureShader(glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat);
-	static LightData getDefaultLightData(); // returns LightData object with default values
+	
 
 };

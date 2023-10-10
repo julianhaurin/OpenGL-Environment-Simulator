@@ -20,6 +20,7 @@
 // std::cerr instead of std::cout?
 // organize shader folder
 // refactor shadow class and model rendering function
+// optimize compute shader - certain work group numbers better than others
 
 // add more comments
 // change pi
@@ -37,11 +38,12 @@ void printUVec3(glm::uvec3 vec) {
 }
 
 // initializes vertices and indices vectors and creates ocean shader program
-Ocean::Ocean(const uint32_t gridDimensions, const float waveHeight_A, glm::vec2 windDir_w, const float length)
+Ocean::Ocean(const uint32_t gridDimensions, const float waveHeight_A, glm::vec2 windDir_w, const float length, const LightData in_lightData)
 	: m_OceanShaderProgram(ShaderProgram("./shaders/oceanVertShader.glsl", "./shaders/oceanFragShader.glsl")),
 	  m_OceanComputeShader(ComputeShader("./shaders/oceanCompShader.glsl")),
 	  m_GridVBO(0), m_GridVAO(0), m_GridEBO(0), m_GridSSBO(0), m_PositionAttrib(0), m_NormalAttrib(0),
-	  m_GridSideDimension(gridDimensions), m_phillipsConstant_A(waveHeight_A), m_windDir_w(windDir_w), m_Length(length)
+	  m_GridSideDimension(gridDimensions), m_phillipsConstant_A(waveHeight_A), m_windDir_w(windDir_w), m_Length(length),
+	  m_LightData(in_lightData)
 {
 	assert(m_GridSideDimension && !(m_GridSideDimension & (m_GridSideDimension - 1))); // m_GridSideDimension == power of 2
 	
@@ -146,7 +148,7 @@ void Ocean::Initialize() {
 	glEnableVertexAttribArray(m_NormalAttrib);
 	glVertexAttribPointer(m_NormalAttrib, 3, GL_FLOAT, GL_FALSE, sizeof(OceanVertex), (GLvoid*)vertexPositionOffset);
 
-	// **********
+	// Compute shader **********
 
 	m_OceanComputeShader.UseProgram();
 	m_OceanComputeShader.SetInt("u_GridSideDimension", m_GridSideDimension);
@@ -169,11 +171,22 @@ void Ocean::Initialize() {
 
 }
 
-void Ocean::Render(const float time, glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat, glm::vec3 in_LightPos, glm::vec3 in_CamPos) { // render function
+void Ocean::Bind() {
+	m_OceanComputeShader.UseProgram();
+	m_OceanShaderProgram.UseProgram();
 
-	//EvaluateWavesDFT(time);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_GridSSBO);
+	glBindVertexArray(m_GridVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_GridVBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_GridEBO);
 
-	// Update SSBO //
+}
+
+void Ocean::Render(const float time, glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat, glm::vec3 in_CamPos) { // render function
+
+	// EvaluateWavesDFT(time); // CPU fourier evaluation - now done on GPU
+
+	// Compute shader //
 	m_OceanComputeShader.UseProgram();
 	m_OceanComputeShader.SetFloat("u_Time", time);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_GridSSBO);
@@ -181,28 +194,15 @@ void Ocean::Render(const float time, glm::mat4 in_ModelMat, glm::mat4 in_ViewMat
 	glDispatchCompute((m_GridSideDimension + 1) * (m_GridSideDimension + 1), 1, 1); // launches this many work groups
 	glMemoryBarrier(GL_ALL_BARRIER_BITS); // makes sure data is computed before vertex shader is rendered
 
-	// read SSBO data
-	glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(m_Vertices[0]) * m_Vertices.size(), &m_Vertices[0]);
+	glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(m_Vertices[0]) * m_Vertices.size(), &m_Vertices[0]); // read SSBO data
 
-	// *****
-
-	// update uniforms //
-	m_OceanShaderProgram.UseProgram();
-	m_OceanShaderProgram.SetMat4("u_Model", in_ModelMat);
-	m_OceanShaderProgram.SetMat4("u_View", in_ViewMat);
-	m_OceanShaderProgram.SetMat4("u_Projection", in_ProjeMat);
-
-	m_OceanShaderProgram.SetVec3("u_CameraWorldPos", in_CamPos);
-	m_OceanShaderProgram.SetFloat("u_AmbientStrength", 0.25f);
-	m_OceanShaderProgram.SetVec3("u_OceanColor", glm::vec3(0.0f, 0.2f, 0.2f));
-	m_OceanShaderProgram.SetVec3("u_LightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-	m_OceanShaderProgram.SetVec3("u_LightPos", in_LightPos);
+	// Shader program //
+	configureShaderProgram(in_ModelMat, in_ViewMat, in_ProjeMat, in_CamPos); // configure shader data
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_GridVBO);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(OceanVertex) * m_Vertices.size(), &m_Vertices[0]);
 	glBindVertexArray(m_GridVAO);
 
-	glDrawArrays(GL_TRIANGLES, 0, 1 * 3);
 	glDrawElements(GL_TRIANGLES, m_Indices.size() * 3, GL_UNSIGNED_INT, 0);
 
 }
@@ -213,6 +213,36 @@ void Ocean::DeallocateResources() {
 	glDeleteVertexArrays(1, &m_GridVBO);
 	glDeleteBuffers(1, &m_GridVAO);
 	glDeleteBuffers(1, &m_GridEBO);
+
+}
+
+void Ocean::configureShaderProgram(glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat, glm::vec3 in_CamPos) {
+
+	// Configure compute shader and update SSBO //
+	//m_OceanComputeShader.UseProgram();
+	//m_OceanComputeShader.SetFloat("u_Time", time);
+
+	// Configure shader program //
+	m_OceanShaderProgram.UseProgram();
+
+	// render matrices
+	m_OceanShaderProgram.SetMat4("u_Model", in_ModelMat);
+	m_OceanShaderProgram.SetMat4("u_View", in_ViewMat);
+	m_OceanShaderProgram.SetMat4("u_Projection", in_ProjeMat);
+
+	// camera data
+	m_OceanShaderProgram.SetVec3("u_CameraWorldPos", in_CamPos);
+
+	// light data - shouldn't need to update each frame
+	m_OceanShaderProgram.SetVec3("u_LightData.position", m_LightData.position);
+	m_OceanShaderProgram.SetVec3("u_LightData.ambient", m_LightData.ambient);
+	m_OceanShaderProgram.SetVec3("u_LightData.diffuse", m_LightData.diffuse);
+	m_OceanShaderProgram.SetVec3("u_LightData.specular", m_LightData.specular);
+
+	// other
+	m_OceanShaderProgram.SetVec3("u_OceanColor", glm::vec3(0.0f, 0.2f, 0.2f));
+	m_OceanShaderProgram.SetFloat("u_AmbientStrength", 0.25f);
+
 
 }
 

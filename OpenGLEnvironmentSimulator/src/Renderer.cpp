@@ -38,8 +38,8 @@ Renderer::Renderer()
     //addModel(floor);
 
     // Custom objects //
+    m_Ocean = std::make_shared<Ocean>(64, 0.00025f, glm::vec2(1.0f, 10.0f), 64, m_Light->getLightData());
     m_ShadowMap = std::make_shared<ShadowMap>(1024, 1024); // resolution 1024 X 1024
-    m_Ocean = std::make_shared<Ocean>(64, 0.00025f, glm::vec2(1.0f, 10.0f), 64);
     //m_SkyBox = std::make_shared<SkyBox>("./assets/skyBox/sunnySky/");
 
 }
@@ -72,9 +72,9 @@ void Renderer::Run() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f); // background color
 
-        // Render scene ************************************ //
+        // Render scene //
         m_Light->Render(m_Model, m_View, m_Projection);
-        m_Ocean->Render(m_currentFrame, m_Model, m_View, m_Projection, lightSourceData.position, m_Camera.getWorldPos());
+        m_Ocean->Render(m_currentFrame, m_Model, m_View, m_Projection, m_Camera.getWorldPos());
         
         // iterate through render objects - is this best practice?
         for (int i = 0; i < m_RenderObjects.size(); i++) {
@@ -83,8 +83,6 @@ void Renderer::Run() {
 
         glfwSwapBuffers(m_Window);
         glfwPollEvents();
-
-        // ************************************************** //
 
         m_frameCount++;
     }

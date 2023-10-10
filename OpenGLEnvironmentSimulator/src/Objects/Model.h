@@ -3,6 +3,7 @@
 // loads data from .obj file
 
 // Notes:
+// try to refactor render() code, requires a lot of arguments rn
 // obj material config path hardcoded to ./assets/textures/ remember this being a bug before but idk if its always necessary
 // allow making models smaller
 // fix default texture ***
@@ -53,7 +54,6 @@ public:
 		glm::mat4 in_LightSpaceMat, 
 		const bool useModelShader = true
 	);
-
 
 private:
 

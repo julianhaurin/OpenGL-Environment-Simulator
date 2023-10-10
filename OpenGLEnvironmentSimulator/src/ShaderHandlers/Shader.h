@@ -7,6 +7,7 @@
 // add common file-reading capability (right now they are split into separate functions within child classes)
 // checkCompilationSuccess return type is weird ... check, lots of changes 
 // abstract retrieveShaderSourceCode() functions to Shader.h
+// way to handle runtime errors?
 
 #pragma once
 

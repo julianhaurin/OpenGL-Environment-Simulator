@@ -1,11 +1,9 @@
 
-#pragma once
-
 // Notes:
-// update 9/6 - i think the destructor is being called??? like when its not supposed to
 // could use pocketfft or kissfft or fftw
+// more in ocean.cpp
 
-// UPDATE RENDER() FUNCTION IN INTERFACE 
+#pragma once
 
 #include <iostream>
 #include <vector>
@@ -17,20 +15,16 @@
 #include <complex>
 #include <random>
 
-#define GLEW_STATIC
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "../Utility/FFT/FFT.h"
 #include "../ShaderHandlers/ShaderProgram.h"
 #include "../ShaderHandlers/ComputeShader.h"
 
-#include "../OpenGLState/VertexBuffer.h"
-#include "../OpenGLState/ElementBuffer.h"
-
+#include "../Objects/Light.h"
 
 // data within ocean grid vertex
 struct OceanVertex {
@@ -60,10 +54,17 @@ class Ocean
 public:
 	const static float gravityConst; // 9.81f
 
-	Ocean(const uint32_t gridDimensions, const float waveHeight_A = 1.0f, glm::vec2 windDir_w = glm::vec2(1.0f, 1.0f), const float length = 8);
+	Ocean(
+		const uint32_t gridDimensions, 
+		const float waveHeight_A = 1.0f, 
+		glm::vec2 windDir_w = glm::vec2(1.0f, 1.0f), 
+		const float length = 8, 
+		const LightData in_lightData = Light::getDefaultLightData()
+	);
 	~Ocean();
 
-	void Render(const float time, glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat, glm::vec3 in_LightPos, glm::vec3 in_CamPos);
+	void Bind();
+	void Render(const float time, glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat, glm::vec3 in_CamPos);
 
 private:
 
@@ -92,12 +93,12 @@ private:
 	const glm::vec2 m_windDir_w;
 	const float m_Length;
 
-	// PocketFFT
-	//const pocketfft::shape_t m_PFFT_shape;
-	//const pocketfft::stride_t m_PFFT_stride;
+	const LightData m_LightData;
 
 	void Initialize();
 	void DeallocateResources();
+
+	void configureShaderProgram(glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat, glm::vec3 in_CamPos);
 
 	// Tessendforf equations
 	float phillipsSpectrum(const int32_t mPrime, const int32_t nPrime) const;
@@ -111,3 +112,5 @@ private:
 	//void EvaluateWavesFFT(const float time); // fast fourier transform
 
 };
+
+// update 9/6 - i think the destructor is being called??? like when its not supposed to
