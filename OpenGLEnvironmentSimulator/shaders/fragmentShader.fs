@@ -23,7 +23,6 @@ struct Material {
 in vec3 inF_Norm;
 in vec3 inF_FragPos;
 in vec2 inF_TexCoords;
-in vec4 inF_FragPosLightSpace;
 
 uniform vec3 u_ViewPosition;
 

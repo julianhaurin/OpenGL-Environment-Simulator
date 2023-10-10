@@ -38,7 +38,7 @@ Renderer::Renderer()
     //addModel(floor);
 
     // Custom objects //
-    m_Ocean = std::make_shared<Ocean>(64, 0.00025f, glm::vec2(1.0f, 10.0f), 64, m_Light->getLightData());
+    m_Ocean = std::make_shared<Ocean>(64, 0.0002f, glm::vec2(1.0f, 10.0f), 64, m_Light->getLightData());
     m_ShadowMap = std::make_shared<ShadowMap>(1024, 1024); // resolution 1024 X 1024
     //m_SkyBox = std::make_shared<SkyBox>("./assets/skyBox/sunnySky/");
 

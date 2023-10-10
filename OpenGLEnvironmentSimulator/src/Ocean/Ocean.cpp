@@ -185,7 +185,7 @@ void Ocean::Bind() {
 void Ocean::Render(const float time, glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat, glm::vec3 in_CamPos) { // render function
 
 	// EvaluateWavesDFT(time); // CPU fourier evaluation - now done on GPU
-
+	
 	// Compute shader //
 	m_OceanComputeShader.UseProgram();
 	m_OceanComputeShader.SetFloat("u_Time", time);
