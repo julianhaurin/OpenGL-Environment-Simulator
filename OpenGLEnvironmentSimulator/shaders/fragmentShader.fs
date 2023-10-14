@@ -49,6 +49,7 @@ vec3 calculatePointLight(Light in_lightData, vec3 in_normal, vec3 in_fragPos, ve
 
     const vec3 lightDir = normalize(in_lightData.position - in_fragPos);
     const vec3 reflectDir = reflect(-lightDir, in_normal);
+    const vec3 halfwayDir = normalize(lightDir + in_camDir); // Blinn-Phong lighting
 
     // ambient
     vec3 ambientLighting = in_lightData.ambient * u_Material.ambient;
@@ -58,7 +59,7 @@ vec3 calculatePointLight(Light in_lightData, vec3 in_normal, vec3 in_fragPos, ve
     vec3 diffuseLighting = diffuse * in_lightData.diffuse * u_Material.diffuse;
 
     // specular
-    const float specular = pow(max(dot(in_camDir, reflectDir), 0.0f), 256);
+    const float specular = pow(max(dot(in_normal, halfwayDir), 0.0f), u_Material.shininess);
     vec3 specularLighting = specular * in_lightData.specular * u_Material.specular;
 
     // attenuation
@@ -82,6 +83,7 @@ void main()
     
     vec3 normal = normalize(inF_Norm);
     vec3 camDir = normalize(u_ViewPosition - inF_FragPos);
+    
 
     vec3 result = vec3(0.0f, 0.0f, 0.0f);
     for (int i = 0; i < LIGHTS_COUNT; i++) {

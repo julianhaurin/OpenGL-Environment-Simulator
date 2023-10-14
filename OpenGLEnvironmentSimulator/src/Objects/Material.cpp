@@ -8,7 +8,7 @@ Material getDefaultMaterial() {
 	defaultMat.ambient = glm::vec3(0.1f, 0.1f, 0.1f);
 	defaultMat.diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
 	defaultMat.specular = glm::vec3(0.9f, 0.9f, 0.9f);
-	defaultMat.shininess = 0.5f;
+	defaultMat.shininess = 256.0f; // *** used in specular calculations - dont think 0 to 1 is good
 
 	return defaultMat;
 
