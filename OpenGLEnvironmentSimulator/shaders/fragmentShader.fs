@@ -9,6 +9,11 @@ struct Light {
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
+
+    float constant;
+	float linear;
+	float quadratic;
+
 };
 
 // material data
@@ -44,17 +49,24 @@ void main()
     const vec3 viewDirection = normalize(u_ViewPosition - inF_FragPos);
     const vec3 reflectDirection = reflect(-lightDirection, normal);
 
+    const float distanceToLight = length(inF_FragPos - u_Light.position);
+    const float attenuation = 
+        1.0f / 
+        (u_Light.constant + 
+        u_Light.linear * distanceToLight + 
+        u_Light.quadratic * (distanceToLight * distanceToLight));
+
     // ambient lighting //
     const float ambient = 1.0f;
-    const vec3 ambientLighting = ambient * u_Light.ambient;
+    const vec3 ambientLighting = ambient * u_Light.ambient * attenuation;
 
     // diffuse lighting //
     const float diffuse = max(dot(normal, lightDirection), 0.0f);
-    const vec3 diffuseLighting = diffuse * u_Light.diffuse;
+    const vec3 diffuseLighting = diffuse * u_Light.diffuse * attenuation;
 
     // specular lighting //
     const float spec = pow(max(dot(viewDirection, reflectDirection), 0.0), 256); // 256 = shininess value
-    const vec3 specularLighting = spec * u_Light.specular;
+    const vec3 specularLighting = spec * u_Light.specular * attenuation;
 
     // result //
     const vec3 result = (ambientLighting + diffuseLighting + specularLighting);

@@ -197,8 +197,11 @@ void Model::configureShader(glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::ma
 	m_ShaderProgram.SetVec3("u_Light.ambient", m_Light.ambient);
 	m_ShaderProgram.SetVec3("u_Light.diffuse", m_Light.diffuse);
 	m_ShaderProgram.SetVec3("u_Light.specular", m_Light.specular);
-	
 
+	m_ShaderProgram.SetFloat("u_Light.constant", m_Light.constant);
+	m_ShaderProgram.SetFloat("u_Light.linear", m_Light.linear);
+	m_ShaderProgram.SetFloat("u_Light.quadratic", m_Light.quadratic);
+	
 	// other (fix) //
 	m_ShaderProgram.SetVec3("u_ViewPosition", in_ViewPos);
 

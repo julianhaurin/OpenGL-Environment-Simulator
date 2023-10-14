@@ -89,6 +89,10 @@ LightData Light::getDefaultLightData() {
 	light.specular = glm::vec3(1.0f, 1.0f, 1.0f);
 	light.position = glm::vec3(10.0f, 10.0f, 10.0f);
 
+	light.constant = 1.0f;
+	light.linear = 0.05f;
+	light.quadratic = 0.005f;
+
 	return light;
 
 }

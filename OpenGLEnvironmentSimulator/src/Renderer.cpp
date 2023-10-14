@@ -33,9 +33,11 @@ Renderer::Renderer()
 
     addModel(duckModel);
 
-    //std::shared_ptr<Model> floor
-    //    = std::make_shared<Model>("./assets/floor.obj", 3);
-    //addModel(floor);
+    std::shared_ptr<Model> floor
+        = std::make_shared<Model>(
+            "./assets/floor.obj", m_Light->getLightData(), getMaterialEmerald(), "./assets/textures/quack.png", 3.0f
+        );
+    addModel(floor);
 
     // Custom objects //
     m_Ocean = std::make_shared<Ocean>(64, 0.0002f, glm::vec2(1.0f, 10.0f), 64, m_Light->getLightData());
@@ -74,7 +76,7 @@ void Renderer::Run() {
 
         // Render scene //
         m_Light->Render(m_Model, m_View, m_Projection);
-        m_Ocean->Render(m_currentFrame, m_Model, m_View, m_Projection, m_Camera.getWorldPos());
+        //m_Ocean->Render(m_currentFrame, m_Model, m_View, m_Projection, m_Camera.getWorldPos());
         
         // iterate through render objects - is this best practice?
         for (int i = 0; i < m_RenderObjects.size(); i++) {
