@@ -9,6 +9,7 @@
 // fix default texture ***
 // abstract further to include light emitting sources or other custom objects (?)
 // size multiplier should be translated thru model matrix
+// accept list of light sources or light source data?
 
 #pragma once
 
@@ -33,9 +34,9 @@ class Model
 public:
 
 	// in_sizeMultiplyer controls size of object
-	Model(const std::string in_objFile, const LightData in_lightSourceData, const float in_sizeMultiplyer = 1);
+	Model(const std::string in_objFile, const std::vector<std::shared_ptr<Light>> in_lightSources, const float in_sizeMultiplyer = 1);
 	Model(const std::string in_objFile,
-		const LightData in_lightSourceData,
+		const std::vector<std::shared_ptr<Light>> in_lightSources,
 		const Material in_material,
 		const std::string in_texturePath,
 		const float in_sizeMultiplyer = 1
@@ -70,7 +71,7 @@ private:
 	std::vector<tinyobj::index_t> m_IndexData; // EBO data
 
 	// model objects
-	LightData m_Light;
+	std::vector<std::shared_ptr<Light>> m_LightSources;
 	Material m_Material;
 	Texture m_Texture;
 	

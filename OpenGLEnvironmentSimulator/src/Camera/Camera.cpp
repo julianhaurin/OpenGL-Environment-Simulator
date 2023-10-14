@@ -41,14 +41,15 @@ void Camera::ProcessKeyboardInput(const CameraMovement in_Direction, const float
 		m_Position -= m_Up * velocity;
 
 	// ARROW KEYS
+	int rotationSpeed = 2.0f;
 	if (in_Direction == YawLeft)
-		m_Yaw -= velocity;
+		m_Yaw -= velocity * rotationSpeed;
 	else if (in_Direction == YawRight)
-		m_Yaw += velocity;
+		m_Yaw += velocity * rotationSpeed;
 	else if (in_Direction == PitchUp)
-		m_Pitch += velocity;
+		m_Pitch += velocity * rotationSpeed;
 	else if (in_Direction == PitchDown)
-		m_Pitch -= velocity;
+		m_Pitch -= velocity * rotationSpeed;
 
 	// constrains camera pitch angle
 	if (m_Pitch > 89.9f)

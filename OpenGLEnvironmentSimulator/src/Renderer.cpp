@@ -10,6 +10,7 @@ const uint32_t Renderer::ScreenWidth = 800;
 
 Renderer::Renderer()
     : m_Window(nullptr), m_Camera(Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f))),
+      m_LightSources(std::vector<std::shared_ptr<Light>>()),
       m_RenderObjects(std::vector<std::shared_ptr<Model>>()),
       m_Model(glm::mat4(1.0f)), m_View(glm::mat4(1.0f)), m_Projection(glm::mat4(1.0f)),
       m_lastY(ScreenHeight / 2.0f), m_lastX(ScreenWidth / 2.0f), // centers init mouse position
@@ -22,25 +23,29 @@ Renderer::Renderer()
     }
     std::cout << "[J] - Renderer successfully initialized! \n\n";
 
-    // Scene light source //
-    m_Light = std::make_shared<Light>();
+    // Scene light sources //
+    m_LightSources.push_back(std::make_shared<Light>());
+
+    LightData secondLightData = Light::getDefaultLightData();
+    secondLightData.position = glm::vec3(-10.0f, 10.0f, -10.0f);
+    m_LightSources.push_back(std::make_shared<Light>(secondLightData));
 
     // Scene models //
     std::shared_ptr<Model> duckModel =
         std::make_shared<Model>(  // source light data, material, texture, size
-            "./assets/quack.obj", m_Light->getLightData(), getMaterialEmerald(), "./assets/textures/quack.png", 0.5f
+            "./assets/quack.obj", m_LightSources, getMaterialEmerald(), "./assets/textures/quack.png", 0.5f
         );
 
     addModel(duckModel);
 
     std::shared_ptr<Model> floor
         = std::make_shared<Model>(
-            "./assets/floor.obj", m_Light->getLightData(), getMaterialEmerald(), "./assets/textures/quack.png", 3.0f
+            "./assets/floor.obj", m_LightSources, getMaterialEmerald(), "./assets/textures/quack.png", 3.0f
         );
     addModel(floor);
 
     // Custom objects //
-    m_Ocean = std::make_shared<Ocean>(64, 0.0002f, glm::vec2(1.0f, 10.0f), 64, m_Light->getLightData());
+    m_Ocean = std::make_shared<Ocean>(64, 0.0002f, glm::vec2(1.0f, 10.0f), 64, m_LightSources[0]->getLightData());
     m_ShadowMap = std::make_shared<ShadowMap>(1024, 1024); // resolution 1024 X 1024
     //m_SkyBox = std::make_shared<SkyBox>("./assets/skyBox/sunnySky/");
 
@@ -60,7 +65,7 @@ void Renderer::addModel(std::shared_ptr<Model> in_model_p) {
 // render loop
 void Renderer::Run() {
 
-    LightData lightSourceData = m_Light->getLightData();
+    // LightData lightSourceData = m_Light->getLightData();
 
     std::cout << "[J] - Beginning render loop... \n";
     while (glfwWindowShouldClose(m_Window) == false)
@@ -75,7 +80,10 @@ void Renderer::Run() {
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f); // background color
 
         // Render scene //
-        m_Light->Render(m_Model, m_View, m_Projection);
+        for (int i = 0; i < m_LightSources.size(); i++) {
+            m_LightSources[i]->Render(m_Model, m_View, m_Projection);
+        }
+        
         //m_Ocean->Render(m_currentFrame, m_Model, m_View, m_Projection, m_Camera.getWorldPos());
         
         // iterate through render objects - is this best practice?

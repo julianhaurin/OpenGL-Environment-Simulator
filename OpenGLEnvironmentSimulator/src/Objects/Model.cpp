@@ -6,11 +6,11 @@
 
 // Public Methods //
 
-Model::Model(const std::string in_objFile, const LightData in_lightSourceData, const float in_sizeMultiplyer)
+Model::Model(const std::string in_objFile, const std::vector<std::shared_ptr<Light>> in_lightSources, const float in_sizeMultiplyer)
 	: m_objFilePath(in_objFile), m_vertexPositionMultiplyer(in_sizeMultiplyer),
 	  m_ShaderProgram(ShaderProgram("./shaders/vertexShader.vs", "./shaders/fragmentShader.fs")),
 	  m_VBO(0), m_EBO(0), m_VAO(0), 
-	  m_Light(in_lightSourceData),
+	  m_LightSources(in_lightSources),
 	  m_Material(getDefaultMaterial()),
 	  m_Texture(Texture("./assets/textures/quack.png"))
 {
@@ -23,7 +23,7 @@ Model::Model(const std::string in_objFile, const LightData in_lightSourceData, c
 
 Model::Model(
 	const std::string in_objFile, 
-	const LightData in_lightSourceData, 
+	const std::vector<std::shared_ptr<Light>> in_lightSources,
 	const Material in_material, 
 	const std::string in_texturePath, 
 	const float in_sizeMultiplyer
@@ -31,7 +31,7 @@ Model::Model(
 	: m_objFilePath(in_objFile), m_vertexPositionMultiplyer(in_sizeMultiplyer),
 	  m_ShaderProgram(ShaderProgram("./shaders/vertexShader.vs", "./shaders/fragmentShader.fs")),
 	  m_VBO(0), m_EBO(0), m_VAO(0), 
-	  m_Light(in_lightSourceData),
+	  m_LightSources(in_lightSources),
 	  m_Material(getDefaultMaterial()),
 	  m_Texture(Texture("./assets/textures/quack.png"))
 {
@@ -63,7 +63,7 @@ void Model::Bind(const bool bindTexture) {
 
 void Model::Render(glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::mat4 in_ProjeMat, glm::vec3 in_ViewPos, glm::mat4 in_LightSpaceMat, const bool useModelShader) {
 
-	configureShader(in_ModelMat, in_ViewMat, in_ProjeMat, in_ViewPos);
+	configureShader(in_ModelMat, in_ViewMat, in_ProjeMat, in_ViewPos); // don't run every loop
 	Bind();
 	glDrawArrays(GL_TRIANGLES, 0, m_VertexData.size() / 3);
 	// glDrawElements(GL_TRIANGLES, m_IndexData.size() * 3, GL_UNSIGNED_INT, 0);
@@ -193,14 +193,20 @@ void Model::configureShader(glm::mat4 in_ModelMat, glm::mat4 in_ViewMat, glm::ma
 	m_ShaderProgram.SetFloat("u_Material.shininess", m_Material.shininess);
 
 	// lighting //
-	m_ShaderProgram.SetVec3("u_Light.position", m_Light.position);
-	m_ShaderProgram.SetVec3("u_Light.ambient", m_Light.ambient);
-	m_ShaderProgram.SetVec3("u_Light.diffuse", m_Light.diffuse);
-	m_ShaderProgram.SetVec3("u_Light.specular", m_Light.specular);
+	for (int i = 0; i < m_LightSources.size(); i++) {
+		LightData lightingData = m_LightSources[i]->getLightData();
 
-	m_ShaderProgram.SetFloat("u_Light.constant", m_Light.constant);
-	m_ShaderProgram.SetFloat("u_Light.linear", m_Light.linear);
-	m_ShaderProgram.SetFloat("u_Light.quadratic", m_Light.quadratic);
+		m_ShaderProgram.SetVec3("u_LightSources[" + std::to_string(i) + "].position", lightingData.position);
+		m_ShaderProgram.SetVec3("u_LightSources[" + std::to_string(i) + "].ambient", lightingData.ambient);
+		m_ShaderProgram.SetVec3("u_LightSources[" + std::to_string(i) + "].diffuse", lightingData.diffuse);
+		m_ShaderProgram.SetVec3("u_LightSources[" + std::to_string(i) + "].specular", lightingData.specular);
+
+		m_ShaderProgram.SetFloat("u_LightSources[" + std::to_string(i) + "].constant", lightingData.constant);
+		m_ShaderProgram.SetFloat("u_LightSources[" + std::to_string(i) + "].linear", lightingData.linear);
+		m_ShaderProgram.SetFloat("u_LightSources[" + std::to_string(i) + "].quadratic", lightingData.quadratic);
+
+	}
+	
 	
 	// other (fix) //
 	m_ShaderProgram.SetVec3("u_ViewPosition", in_ViewPos);

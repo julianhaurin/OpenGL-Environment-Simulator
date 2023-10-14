@@ -52,7 +52,7 @@ private:
 	Camera m_Camera; // camera abstraction
 
 	// light source of scene
-	std::shared_ptr<Light> m_Light;
+	std::vector<std::shared_ptr<Light>> m_LightSources;
 
 	// list of render objects
 	std::vector<std::shared_ptr<Model>> m_RenderObjects;

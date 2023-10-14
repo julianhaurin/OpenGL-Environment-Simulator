@@ -3,6 +3,9 @@
 
 #version 430 core
 
+// number of individual light sources in scene
+#define LIGHTS_COUNT 2
+
 // light data
 struct Light {
     vec3 position;
@@ -32,7 +35,7 @@ in vec2 inF_TexCoords;
 uniform vec3 u_ViewPosition;
 
 // lighting and material values
-uniform Light u_Light;
+uniform Light u_LightSources[LIGHTS_COUNT];
 uniform Material u_Material;
 
 // texture data
@@ -41,35 +44,53 @@ uniform sampler2D u_TextureData;
 // output frag color
 out vec4 out_FragColor;
 
+// calculates all point lights in scene
+vec3 calculatePointLight(Light in_lightData, vec3 in_normal, vec3 in_fragPos, vec3 in_camDir) {
+
+    const vec3 lightDir = normalize(in_lightData.position - in_fragPos);
+    const vec3 reflectDir = reflect(-lightDir, in_normal);
+
+    // ambient
+    vec3 ambientLighting = in_lightData.ambient * u_Material.ambient;
+
+    // diffuse
+    const float diffuse = max(dot(in_normal, lightDir), 0.0f);
+    vec3 diffuseLighting = diffuse * in_lightData.diffuse * u_Material.diffuse;
+
+    // specular
+    const float specular = pow(max(dot(in_camDir, reflectDir), 0.0f), 256);
+    vec3 specularLighting = specular * in_lightData.specular * u_Material.specular;
+
+    // attenuation
+    const float distanceToLight = length(in_fragPos - in_lightData.position);
+    const float attenuation = 1.0f / 
+        (in_lightData.constant + 
+        in_lightData.linear * distanceToLight + 
+        in_lightData.quadratic * (distanceToLight * distanceToLight));
+
+    ambientLighting *= attenuation;
+    diffuseLighting *= attenuation;
+    specularLighting *= attenuation;
+
+    return (ambientLighting + diffuseLighting + specularLighting);
+
+
+}
+
 void main()
 {
+    
+    vec3 normal = normalize(inF_Norm);
+    vec3 camDir = normalize(u_ViewPosition - inF_FragPos);
 
-    const vec3 normal = normalize(inF_Norm);
-    const vec3 lightDirection = normalize(u_Light.position - inF_FragPos);
-    const vec3 viewDirection = normalize(u_ViewPosition - inF_FragPos);
-    const vec3 reflectDirection = reflect(-lightDirection, normal);
-
-    const float distanceToLight = length(inF_FragPos - u_Light.position);
-    const float attenuation = 
-        1.0f / 
-        (u_Light.constant + 
-        u_Light.linear * distanceToLight + 
-        u_Light.quadratic * (distanceToLight * distanceToLight));
-
-    // ambient lighting //
-    const float ambient = 1.0f;
-    const vec3 ambientLighting = ambient * u_Light.ambient * attenuation;
-
-    // diffuse lighting //
-    const float diffuse = max(dot(normal, lightDirection), 0.0f);
-    const vec3 diffuseLighting = diffuse * u_Light.diffuse * attenuation;
-
-    // specular lighting //
-    const float spec = pow(max(dot(viewDirection, reflectDirection), 0.0), 256); // 256 = shininess value
-    const vec3 specularLighting = spec * u_Light.specular * attenuation;
+    vec3 result = vec3(0.0f, 0.0f, 0.0f);
+    for (int i = 0; i < LIGHTS_COUNT; i++) {
+        vec3 lightResult = calculatePointLight(u_LightSources[i], normal, inF_FragPos, camDir);
+        result += lightResult;
+    }
+    
 
     // result //
-    const vec3 result = (ambientLighting + diffuseLighting + specularLighting);
     out_FragColor = texture(u_TextureData, inF_TexCoords) * vec4(result, 0.1f);
 
 }
